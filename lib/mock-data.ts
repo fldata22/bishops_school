@@ -343,7 +343,32 @@ export function getSessionsThisMonth(courseId: string): number {
   }).length
 }
 
-export function getWeeklyTrend(courseId?: string): WeeklyTrend[] {
+// Per-student, per-course weekly trend (spec: plan Task 2 line 604)
+export function getWeeklyTrend(studentId: string, courseId: string): WeeklyTrend[] {
+  const now = new Date()
+  const allSessions = getAllSessions()
+  const allAtt = getAllAttendance()
+  return Array.from({ length: 4 }, (_, i) => {
+    const weekStart = new Date(now)
+    weekStart.setDate(weekStart.getDate() - (i + 1) * 7)
+    const weekEnd = new Date(weekStart)
+    weekEnd.setDate(weekEnd.getDate() + 7)
+    const weekSessions = allSessions.filter(s => {
+      if (s.courseId !== courseId) return false
+      const d = new Date(s.date)
+      return d >= weekStart && d < weekEnd
+    })
+    const total = weekSessions.length
+    if (total === 0) return { weekLabel: `W${4 - i}`, rate: 0 }
+    const present = weekSessions.filter(ses =>
+      allAtt.some(a => a.sessionId === ses.id && a.studentId === studentId && a.status === 'present')
+    ).length
+    return { weekLabel: `W${4 - i}`, rate: Math.round((present / total) * 100) }
+  }).reverse()
+}
+
+// Course-wide or school-wide weekly trend (for dashboard use)
+export function getCourseWeeklyTrend(courseId?: string): WeeklyTrend[] {
   const now = new Date()
   const allSessions = getAllSessions()
   const allAtt = getAllAttendance()
@@ -360,10 +385,9 @@ export function getWeeklyTrend(courseId?: string): WeeklyTrend[] {
     const total = weekSessions.length
     if (total === 0) return { weekLabel: `W${4 - i}`, rate: 0 }
     const presentCount = weekSessions.reduce((acc, ses) => {
-      const sessionRecords = allAtt.filter(a => a.sessionId === ses.id)
-      const presentInSession = sessionRecords.filter(a => a.status === 'present').length
-      const totalInSession = sessionRecords.length
-      return acc + (totalInSession > 0 ? presentInSession / totalInSession : 0)
+      const recs = allAtt.filter(a => a.sessionId === ses.id)
+      const pres = recs.filter(a => a.status === 'present').length
+      return acc + (recs.length > 0 ? pres / recs.length : 0)
     }, 0)
     return { weekLabel: `W${4 - i}`, rate: Math.round((presentCount / total) * 100) }
   }).reverse()
