@@ -392,6 +392,24 @@ export function getClassAttendanceRate(classId: string): number {
   return Math.round(rates.reduce((a, b) => a + b, 0) / rates.length)
 }
 
+// Per-topic stats for a module: taught status + attendance rate per topic
+export function getModuleTopicStats(moduleId: string): { topic: string; sessions: number; attendanceRate: number; taught: boolean }[] {
+  const mod = getModuleById(moduleId)
+  if (!mod) return []
+  const allSessions = getAllSessions().filter(s => s.moduleId === moduleId)
+  return mod.topics.map((topic, i) => {
+    const topicSessions = allSessions.filter(s => s.topicIndex === i)
+    if (topicSessions.length === 0) return { topic, sessions: 0, attendanceRate: 0, taught: false }
+    let present = 0, total = 0
+    for (const session of topicSessions) {
+      const att = getAttendanceForSession(session.id)
+      present += att.filter(a => a.status === 'present').length
+      total += att.length
+    }
+    return { topic, sessions: topicSessions.length, attendanceRate: total > 0 ? Math.round((present / total) * 100) : 0, taught: true }
+  })
+}
+
 // Module attendance rate (across all sessions for this module, across all classes)
 export function getModuleAttendanceRate(moduleId: string): number {
   const sessions = getSessionsByModule(moduleId)

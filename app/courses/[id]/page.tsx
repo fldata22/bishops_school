@@ -5,7 +5,7 @@ import PrincipalShell from '@/components/layout/PrincipalShell'
 import {
   getModuleById, getStudentsForModule, getModuleAttendanceRate,
   getSessionsByModule, getAttendanceForSession, getTeachersForModule,
-  getAttendanceRate
+  getAttendanceRate, getStudentAvatarUrl, getModuleTopicStats
 } from '@/lib/mock-data'
 import {
   CaretRight,
@@ -39,6 +39,8 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
 
   const teacherAssignments = getTeachersForModule(params.id)
   const primaryTeacher = teacherAssignments[0]?.teacher
+  const topicStats = getModuleTopicStats(params.id)
+  const taughtCount = topicStats.filter(t => t.taught).length
 
   return (
     <PrincipalShell>
@@ -147,7 +149,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
                           <Link href={`/students/${student.id}`} className="flex items-center gap-4">
                             <div className="w-10 h-10 rounded-full overflow-hidden border border-outline-variant/20 shrink-0">
                               <Image
-                                src={`https://i.pravatar.cc/80?u=${student.id}`}
+                                src={getStudentAvatarUrl(student.id)}
                                 alt={student.name}
                                 width={40}
                                 height={40}
@@ -180,41 +182,43 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
             </div>
           </section>
 
-          {/* Bottom section: Topics + Avg Attendance */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="bg-surface-container-low p-8 rounded-xl border border-outline-variant/10 space-y-4">
+          {/* Bottom section: Topic completion */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
               <h3 className="font-headline font-bold text-lg flex items-center gap-2">
                 <NotePencil size={20} className="text-primary" />
-                Module Topics
+                Topic Progress
               </h3>
-              <p className="text-sm text-on-surface-variant font-label leading-relaxed">
-                {moduleData.name} covers {moduleData.topics.length} topics. {sessionsThisMonth} sessions held this month.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {moduleData.topics.slice(0, 6).map((topic, i) => (
-                  <span key={i} className="px-2.5 py-1 bg-surface-container-highest text-on-surface-variant text-xs font-label rounded-lg">{topic}</span>
-                ))}
-                {moduleData.topics.length > 6 && (
-                  <span className="px-2.5 py-1 bg-primary/10 text-primary text-xs font-label rounded-lg">+{moduleData.topics.length - 6} more</span>
-                )}
-              </div>
+              <span className="text-xs font-label text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">
+                {taughtCount}/{topicStats.length} taught
+              </span>
             </div>
-            <div className="bg-surface-container-low p-8 rounded-xl border border-outline-variant/10 flex flex-col justify-center gap-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-secondary-container/20 flex items-center justify-center">
-                  <TrendUp size={24} className="text-secondary" />
-                </div>
-                <div>
-                  <div className="font-bold font-label">{avgRate}% Average Attendance</div>
-                  <div className="text-xs text-on-surface-variant font-label">Across all classes teaching {moduleData.code}</div>
-                </div>
-              </div>
-              <div className="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-secondary rounded-full shadow-[0_0_10px_rgba(105,246,184,0.4)]"
-                  style={{ width: `${avgRate}%` }}
-                />
-              </div>
+            <div className="bg-surface-container-low rounded-xl border border-outline-variant/10 overflow-hidden divide-y divide-outline-variant/5">
+              {topicStats.map((t, i) => {
+                const barColor = !t.taught ? 'bg-outline-variant/30' : t.attendanceRate >= 80 ? 'bg-secondary' : t.attendanceRate >= 65 ? 'bg-primary' : 'bg-error'
+                const rateColor = !t.taught ? 'text-on-surface-variant' : t.attendanceRate >= 80 ? 'text-secondary' : t.attendanceRate >= 65 ? 'text-primary' : 'text-error'
+                return (
+                  <div key={i} className="px-6 py-4 flex items-center gap-4">
+                    <span className="w-6 h-6 rounded-full bg-surface-container-highest text-[10px] font-bold font-label text-on-surface-variant flex items-center justify-center shrink-0">{i + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-label font-medium text-on-surface truncate">{t.topic}</p>
+                      <div className="mt-1.5 h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+                        <div className={`h-full rounded-full ${barColor}`} style={{ width: t.taught ? `${t.attendanceRate}%` : '0%' }} />
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0 w-20">
+                      {t.taught ? (
+                        <>
+                          <span className={`text-sm font-black font-headline ${rateColor}`}>{t.attendanceRate}%</span>
+                          <p className="text-[10px] text-on-surface-variant font-label">{t.sessions} session{t.sessions > 1 ? 's' : ''}</p>
+                        </>
+                      ) : (
+                        <span className="text-[10px] font-label text-on-surface-variant uppercase tracking-wider">Not started</span>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </div>
 
@@ -270,6 +274,40 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
             </div>
           </section>
 
+          {/* Mobile: Topic progress */}
+          <section className="space-y-3 mb-6">
+            <div className="flex items-center justify-between">
+              <h3 className="font-headline text-lg font-bold">Topic Progress</h3>
+              <span className="bg-surface-container-highest px-3 py-1 rounded-full text-xs font-label font-medium text-primary">
+                {taughtCount}/{topicStats.length} taught
+              </span>
+            </div>
+            <div className="bg-surface-container-high rounded-xl overflow-hidden divide-y divide-outline-variant/5">
+              {topicStats.map((t, i) => {
+                const barColor = !t.taught ? 'bg-outline-variant/30' : t.attendanceRate >= 80 ? 'bg-secondary' : t.attendanceRate >= 65 ? 'bg-primary' : 'bg-error'
+                const rateColor = !t.taught ? 'text-on-surface-variant' : t.attendanceRate >= 80 ? 'text-secondary' : t.attendanceRate >= 65 ? 'text-primary' : 'text-error'
+                return (
+                  <div key={i} className="px-4 py-3 flex items-center gap-3">
+                    <span className="w-5 h-5 rounded-full bg-surface-container-highest text-[10px] font-bold font-label text-on-surface-variant flex items-center justify-center shrink-0">{i + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-label font-medium text-on-surface truncate">{t.topic}</p>
+                      <div className="mt-1 h-1 w-full bg-surface-container-highest rounded-full overflow-hidden">
+                        <div className={`h-full rounded-full ${barColor}`} style={{ width: t.taught ? `${t.attendanceRate}%` : '0%' }} />
+                      </div>
+                    </div>
+                    <div className="shrink-0 text-right w-16">
+                      {t.taught ? (
+                        <span className={`text-sm font-black font-headline ${rateColor}`}>{t.attendanceRate}%</span>
+                      ) : (
+                        <span className="text-[9px] font-label text-on-surface-variant uppercase tracking-wider">Pending</span>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </section>
+
           {/* Mobile: Students list */}
           <section className="space-y-4">
             <div className="flex items-center justify-between">
@@ -291,7 +329,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
                     <div className="flex items-center gap-4">
                       <div className={`w-12 h-12 rounded-full overflow-hidden border-2 ${isPresent ? 'border-secondary/20' : 'border-error/20'} shrink-0`}>
                         <Image
-                          src={`https://i.pravatar.cc/80?u=${student.id}`}
+                          src={getStudentAvatarUrl(student.id)}
                           alt={student.name}
                           width={48}
                           height={48}
