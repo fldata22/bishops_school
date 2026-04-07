@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Manrope, Inter } from 'next/font/google'
 import './globals.css'
 
@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: 'Course Tracker',
   description: 'Track student attendance',
   manifest: '/manifest.json',
+}
+
+export const viewport: Viewport = {
   themeColor: '#060e20',
 }
 
