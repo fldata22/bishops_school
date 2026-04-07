@@ -34,7 +34,7 @@ export const TEACHERS: Teacher[] = [
 
 export const PRINCIPAL: Principal = {
   id: 'p1', name: 'Dr. Julian Vance',
-  email: 'principal@academy.edu', password: 'nocturne2026'
+  email: 'admin@school.com', password: 'admin123'
 }
 
 export const STUDENTS: Student[] = [

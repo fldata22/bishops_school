@@ -38,7 +38,7 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-3">
           <input
             type="email" value={email} onChange={e => setEmail(e.target.value)}
-            required autoComplete="email" placeholder="Email"
+            required autoComplete="email" placeholder="admin@school.com"
             className="w-full px-4 py-3 rounded-xl text-sm font-label text-on-surface placeholder:text-on-surface-variant/50 outline-none border border-white/8 focus:border-primary/50 transition-all duration-200"
             style={{ background: 'rgba(255,255,255,0.05)' }}
           />
