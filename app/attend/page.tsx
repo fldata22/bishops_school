@@ -15,6 +15,7 @@ export default function AttendPage() {
   const [teacherId, setTeacherId] = useState('')
   const [classId, setClassId] = useState('')
   const [statuses, setStatuses] = useState<Record<string, 'present' | 'absent'>>({})
+  const [levels, setLevels] = useState<Record<string, 1 | 2 | 3 | 4>>({})
   const [error, setError] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [submittedClassName, setSubmittedClassName] = useState('')
@@ -37,6 +38,7 @@ export default function AttendPage() {
     setTeacherId(id)
     setClassId('')
     setStatuses({})
+    setLevels({})
     setError('')
   }
 
@@ -45,10 +47,19 @@ export default function AttendPage() {
     setError('')
     const s = getStudentsByClass(id)
     setStatuses(Object.fromEntries(s.map(st => [st.id, 'present'])))
+    setLevels(Object.fromEntries(s.map(st => [st.id, 3 as const])))
   }
 
   function toggleStudent(studentId: string) {
     setStatuses(prev => ({ ...prev, [studentId]: prev[studentId] === 'present' ? 'absent' : 'present' }))
+  }
+
+  function cycleLevel(studentId: string) {
+    setLevels(prev => {
+      const cur = prev[studentId] ?? 3
+      const next = (cur % 4) + 1 as 1 | 2 | 3 | 4
+      return { ...prev, [studentId]: next }
+    })
   }
 
   function handleSubmit() {
@@ -62,7 +73,11 @@ export default function AttendPage() {
       moduleId: assignment.moduleId,
       teacherId,
       date: today,
-      records: students.map(s => ({ studentId: s.id, status: statuses[s.id] ?? 'present' })),
+      records: students.map(s => ({
+        studentId: s.id,
+        status: statuses[s.id] ?? 'present',
+        ...(statuses[s.id] !== 'absent' ? { participationLevel: levels[s.id] ?? 3 } : {}),
+      })),
     })
     if (!result.success) { setError(result.error ?? 'Submission failed.'); return }
     const cls = getClassById(classId)
@@ -73,6 +88,7 @@ export default function AttendPage() {
   function handleSubmitAnother() {
     setClassId('')
     setStatuses({})
+    setLevels({})
     setError('')
     setSubmitted(false)
     setSubmittedClassName('')
@@ -133,7 +149,7 @@ export default function AttendPage() {
               <span className="text-tertiary">{absentCount} absent</span>
             </div>
           </div>
-          <StudentToggleList students={students} statuses={statuses} onToggle={toggleStudent} />
+          <StudentToggleList students={students} statuses={statuses} levels={levels} onToggle={toggleStudent} onCycleLevel={cycleLevel} />
         </>
       )}
 

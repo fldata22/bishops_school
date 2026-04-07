@@ -267,18 +267,29 @@ export const SESSIONS: Session[] = [
 
 // ─── Attendance ───────────────────────────────────────────────────────────────
 
+// Deterministic participation level from session+student ids (weighted toward L3/L4)
+function deterministicLevel(sessionId: string, studentId: string): 1 | 2 | 3 | 4 {
+  const hash = (sessionId + studentId).split('').reduce((a, c) => a + c.charCodeAt(0), 0)
+  const levels: (1 | 2 | 3 | 4)[] = [3, 4, 3, 3, 4, 2, 3, 4, 3, 1, 3, 4]
+  return levels[hash % levels.length]
+}
+
 function makeAttendance(
   sessionId: string,
   classId: string,
   absentStudentIds: string[]
 ): Attendance[] {
   const classStudents = STUDENTS.filter(s => s.classId === classId)
-  return classStudents.map((s) => ({
-    id: `att-${sessionId}-${s.id}`,
-    sessionId,
-    studentId: s.id,
-    status: absentStudentIds.includes(s.id) ? 'absent' : 'present',
-  }))
+  return classStudents.map((s) => {
+    const absent = absentStudentIds.includes(s.id)
+    return {
+      id: `att-${sessionId}-${s.id}`,
+      sessionId,
+      studentId: s.id,
+      status: absent ? 'absent' : 'present',
+      ...(absent ? {} : { participationLevel: deterministicLevel(sessionId, s.id) }),
+    }
+  })
 }
 
 export const ATTENDANCE: Attendance[] = [
@@ -568,12 +579,27 @@ export function getTotalSessionsCount(): number {
   return getAllSessions().length
 }
 
+export function getStudentParticipationAvg(studentId: string): { avg: number; score: number; label: string } | null {
+  const student = STUDENTS.find(s => s.id === studentId)
+  if (!student) return null
+  const records = getAllAttendance().filter(
+    a => a.studentId === studentId && a.status === 'present' && a.participationLevel != null
+  )
+  if (records.length === 0) return null
+  const LEVEL_SCORE: Record<number, number> = { 1: 0, 2: 25, 3: 50, 4: 75 }
+  const totalScore = records.reduce((sum, r) => sum + LEVEL_SCORE[r.participationLevel!], 0)
+  const avg = Math.round(totalScore / records.length)
+  const LEVEL_LABEL: Record<number, string> = { 1: 'Needs improvement', 2: 'Occasional', 3: 'Consistent', 4: 'Excellent' }
+  const avgLevel = avg >= 63 ? 4 : avg >= 38 ? 3 : avg >= 13 ? 2 : 1
+  return { avg, score: totalScore, label: LEVEL_LABEL[avgLevel] }
+}
+
 export function submitSession(params: {
   classId: string
   moduleId: string
   teacherId: string
   date: string
-  records: { studentId: string; status: 'present' | 'absent' }[]
+  records: { studentId: string; status: 'present' | 'absent'; participationLevel?: 1 | 2 | 3 | 4 }[]
 }): { success: boolean; error?: string } {
   const existing = getAllSessions().find(
     s => s.classId === params.classId && s.date === params.date && s.moduleId === params.moduleId
@@ -582,7 +608,13 @@ export function submitSession(params: {
   const sessionId = `rt-${Date.now()}`
   runtimeSessions.push({ id: sessionId, classId: params.classId, moduleId: params.moduleId, teacherId: params.teacherId, date: params.date })
   params.records.forEach((r, i) => {
-    runtimeAttendance.push({ id: `rta-${sessionId}-${i}`, sessionId, studentId: r.studentId, status: r.status })
+    runtimeAttendance.push({
+      id: `rta-${sessionId}-${i}`,
+      sessionId,
+      studentId: r.studentId,
+      status: r.status,
+      ...(r.status === 'present' && r.participationLevel ? { participationLevel: r.participationLevel } : {}),
+    })
   })
   return { success: true }
 }

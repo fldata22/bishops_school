@@ -3,7 +3,7 @@ import Image from 'next/image'
 import PrincipalShell from '@/components/layout/PrincipalShell'
 import {
   getStudentById, getCoursesForStudent, getAttendanceRate,
-  getClassById, getChurchById, getDenominationById
+  getClassById, getChurchById, getDenominationById, getStudentParticipationAvg
 } from '@/lib/mock-data'
 import {
   Seal,
@@ -11,6 +11,7 @@ import {
   XCircle,
   GraduationCap,
   ChartBar,
+  Star,
 } from '@phosphor-icons/react/dist/ssr'
 
 export default function StudentProfilePage({ params }: { params: { id: string } }) {
@@ -22,6 +23,7 @@ export default function StudentProfilePage({ params }: { params: { id: string } 
   const { present: totalPresent, total: totalSessions } = getAttendanceRate(params.id)
   const totalAbsent = totalSessions - totalPresent
   const overallRate = totalSessions > 0 ? Math.round((totalPresent / totalSessions) * 100) : 0
+  const participation = getStudentParticipationAvg(params.id)
 
   const studentClass = getClassById(student.classId)
   const church = getChurchById(student.churchId)
@@ -73,8 +75,8 @@ export default function StudentProfilePage({ params }: { params: { id: string } 
           </div>
         </section>
 
-        {/* ── Desktop 2-stat bento grid ── */}
-        <section className="hidden md:grid grid-cols-2 gap-4 mb-8">
+        {/* ── Desktop stat bento grid ── */}
+        <section className="hidden md:grid grid-cols-3 gap-4 mb-8">
           <div className="bg-surface-container-low p-6 rounded-xl border border-outline-variant/5 hover:bg-surface-container-high transition-colors">
             <div className="flex justify-between items-start mb-4">
               <CheckCircle size={30} className="text-secondary" weight="fill" />
@@ -90,6 +92,14 @@ export default function StudentProfilePage({ params }: { params: { id: string } 
             </div>
             <h3 className="text-on-surface-variant text-sm font-label font-medium">Absent</h3>
             <p className="text-xs text-on-surface-variant font-label mt-1">{totalAbsent} of {totalSessions} classes missed</p>
+          </div>
+          <div className="bg-surface-container-low p-6 rounded-xl border border-outline-variant/5 hover:bg-surface-container-high transition-colors">
+            <div className="flex justify-between items-start mb-4">
+              <Star size={30} className="text-primary" weight="fill" />
+              {participation && <span className="text-primary font-bold text-lg font-headline">{participation.avg}%</span>}
+            </div>
+            <h3 className="text-on-surface-variant text-sm font-label font-medium">Participation</h3>
+            <p className="text-xs text-on-surface-variant font-label mt-1">{participation ? participation.label : 'No data yet'}</p>
           </div>
         </section>
 
@@ -181,27 +191,39 @@ export default function StudentProfilePage({ params }: { params: { id: string } 
           </div>
         </section>
 
-        {/* ── Mobile 2-stat grid ── */}
-        <section className="md:hidden grid grid-cols-2 gap-4 mb-8">
-          <div className="bg-surface-container-high rounded-xl p-5 border border-outline-variant/10 flex flex-col space-y-2">
-            <span className="text-secondary text-[12px] font-bold tracking-widest uppercase font-label">Present</span>
-            <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-headline font-bold">{totalPresent}</span>
+        {/* ── Mobile stat grid ── */}
+        <section className="md:hidden space-y-3 mb-8">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-surface-container-high rounded-xl p-5 border border-outline-variant/10 flex flex-col space-y-2">
+              <span className="text-secondary text-[12px] font-bold tracking-widest uppercase font-label">Present</span>
+              <div className="flex items-baseline gap-1">
+                <span className="text-3xl font-headline font-bold">{totalPresent}</span>
+              </div>
+              <p className="text-[10px] text-on-surface-variant font-label">{totalPresent}/{totalSessions} classes</p>
+              <div className="h-1 w-full bg-secondary-container/30 rounded-full overflow-hidden">
+                <div className="h-full bg-secondary rounded-full" style={{ width: `${overallRate}%` }} />
+              </div>
             </div>
-            <p className="text-[10px] text-on-surface-variant font-label">{totalPresent}/{totalSessions} classes</p>
-            <div className="h-1 w-full bg-secondary-container/30 rounded-full overflow-hidden">
-              <div className="h-full bg-secondary rounded-full" style={{ width: `${overallRate}%` }} />
+            <div className="bg-surface-container-high rounded-xl p-5 border border-outline-variant/10 flex flex-col space-y-2">
+              <span className="text-error text-[12px] font-bold tracking-widest uppercase font-label">Absent</span>
+              <div className="flex items-baseline gap-1">
+                <span className="text-3xl font-headline font-bold">{totalAbsent}</span>
+              </div>
+              <p className="text-[10px] text-on-surface-variant font-label">{totalAbsent}/{totalSessions} classes</p>
+              <div className="h-1 w-full bg-error-container/30 rounded-full overflow-hidden">
+                <div className="h-full bg-error rounded-full" style={{ width: `${totalSessions > 0 ? Math.round((totalAbsent / totalSessions) * 100) : 0}%` }} />
+              </div>
             </div>
           </div>
-          <div className="bg-surface-container-high rounded-xl p-5 border border-outline-variant/10 flex flex-col space-y-2">
-            <span className="text-error text-[12px] font-bold tracking-widest uppercase font-label">Absent</span>
-            <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-headline font-bold">{totalAbsent}</span>
+          <div className="bg-surface-container-high rounded-xl p-5 border border-outline-variant/10 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Star size={20} className="text-primary" weight="fill" />
+              <div>
+                <span className="text-primary text-[12px] font-bold tracking-widest uppercase font-label">Participation</span>
+                <p className="text-[10px] text-on-surface-variant font-label mt-0.5">{participation ? participation.label : 'No data yet'}</p>
+              </div>
             </div>
-            <p className="text-[10px] text-on-surface-variant font-label">{totalAbsent}/{totalSessions} classes</p>
-            <div className="h-1 w-full bg-error-container/30 rounded-full overflow-hidden">
-              <div className="h-full bg-error rounded-full" style={{ width: `${totalSessions > 0 ? Math.round((totalAbsent / totalSessions) * 100) : 0}%` }} />
-            </div>
+            {participation && <span className="text-2xl font-headline font-bold text-primary">{participation.avg}%</span>}
           </div>
         </section>
 

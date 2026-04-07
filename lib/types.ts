@@ -61,6 +61,7 @@ export interface Attendance {
   sessionId: string
   studentId: string
   status: 'present' | 'absent'
+  participationLevel?: 1 | 2 | 3 | 4
 }
 
 export interface AttendanceRate {
