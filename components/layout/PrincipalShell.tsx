@@ -1,22 +1,12 @@
 'use client'
 import Image from 'next/image'
-import { useAuth } from '@/lib/auth-context'
-import { useRouter, usePathname } from 'next/navigation'
-import { useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { MagnifyingGlass } from '@phosphor-icons/react'
 import BottomNav from './BottomNav'
 import Sidebar from './Sidebar'
 
 export default function PrincipalShell({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuth()
-  const router = useRouter()
   const pathname = usePathname()
-
-  useEffect(() => {
-    if (!isAuthenticated) router.replace('/login')
-  }, [isAuthenticated, router])
-
-  if (!isAuthenticated) return null
 
   return (
     <div className="min-h-[100dvh]">

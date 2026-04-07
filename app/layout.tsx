@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Manrope, Inter } from 'next/font/google'
 import './globals.css'
-import { AuthProvider } from '@/lib/auth-context'
 
 const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope', display: 'swap' })
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })
@@ -45,7 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {/* ── App content ──────────────────────────────────────────────────── */}
         <div className="relative" style={{ zIndex: 1 }}>
-          <AuthProvider>{children}</AuthProvider>
+          {children}
         </div>
 
       </body>
