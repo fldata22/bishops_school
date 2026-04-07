@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import type { Course } from '@/lib/types'
 import { MagnifyingGlass } from '@phosphor-icons/react'
 import CourseCard from '@/components/ui/CourseCard'
@@ -7,6 +8,16 @@ import CourseCard from '@/components/ui/CourseCard'
 type Filter = 'all' | 'morning' | 'afternoon'
 
 interface Props { courses: Course[]; rates: Record<string, number> }
+
+const container = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.05 } }
+}
+
+const item = {
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 100, damping: 20 } }
+}
 
 export default function CourseDirectoryClient({ courses, rates }: Props) {
   const [query, setQuery] = useState('')
@@ -38,10 +49,15 @@ export default function CourseDirectoryClient({ courses, rates }: Props) {
           </button>
         ))}
       </div>
-      <div className="flex flex-col gap-3 md:grid md:grid-cols-2 lg:grid-cols-3">
-        {filtered.map(c => <CourseCard key={c.id} course={c} avgRate={rates[c.id] ?? 0} />)}
+      <motion.div className="flex flex-col gap-3 md:grid md:grid-cols-2 lg:grid-cols-3"
+        initial="hidden" animate="visible" variants={container} key={filter + query}>
+        {filtered.map(c => (
+          <motion.div key={c.id} variants={item}>
+            <CourseCard course={c} avgRate={rates[c.id] ?? 0} />
+          </motion.div>
+        ))}
         {filtered.length === 0 && <p className="text-sm font-label text-on-surface-variant col-span-3">No courses match your search.</p>}
-      </div>
+      </motion.div>
     </>
   )
 }

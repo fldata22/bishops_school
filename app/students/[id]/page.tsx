@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import PrincipalShell from '@/components/layout/PrincipalShell'
 import {
   getStudentById, getCoursesForStudent, getAttendanceRate,
-  getWeeklyTrend, getRecentAttendanceHistory
+  getRecentAttendanceHistory
 } from '@/lib/mock-data'
 import StatusBadge from '@/components/ui/StatusBadge'
 import ProgressNebula from '@/components/ui/ProgressNebula'

@@ -206,8 +206,8 @@ export const ATTENDANCE: Attendance[] = [
 
 // ─── Runtime mutable arrays (for /attend submissions) ────────────────────────
 
-let runtimeSessions: Session[] = []
-let runtimeAttendance: Attendance[] = []
+const runtimeSessions: Session[] = []
+const runtimeAttendance: Attendance[] = []
 
 // ─── Query Functions ─────────────────────────────────────────────────────────
 
