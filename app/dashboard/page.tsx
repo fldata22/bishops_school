@@ -51,9 +51,6 @@ export default function DashboardPage() {
             <p className="text-on-surface-variant font-label text-sm">Academic Quarter: Q3 · Today is {today}</p>
           </div>
           <div className="flex gap-3">
-            <button className="px-5 py-2.5 rounded-full bg-surface-container-highest text-on-surface border border-outline-variant/20 text-sm font-label font-medium hover:bg-surface-bright transition-all">
-              Daily Report
-            </button>
             <Link href="/attend"
               className="px-6 py-2.5 rounded-full bg-gradient-to-br from-primary to-primary-dim text-on-primary font-label font-bold text-sm shadow-xl shadow-primary/20 hover:scale-95 transition-transform">
               Take Attendance
