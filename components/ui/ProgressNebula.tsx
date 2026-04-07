@@ -1,4 +1,3 @@
-'use client'
 interface Props { value: number; size?: number; strokeWidth?: number }
 
 export default function ProgressNebula({ value, size = 80, strokeWidth = 6 }: Props) {
