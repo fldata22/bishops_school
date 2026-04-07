@@ -589,7 +589,7 @@ export function getStudentParticipationAvg(studentId: string): { avg: number; sc
   const LEVEL_SCORE: Record<number, number> = { 1: 0, 2: 25, 3: 50, 4: 75 }
   const totalScore = records.reduce((sum, r) => sum + LEVEL_SCORE[r.participationLevel!], 0)
   const avg = Math.round(totalScore / records.length)
-  const LEVEL_LABEL: Record<number, string> = { 1: 'Needs improvement', 2: 'Occasional', 3: 'Consistent', 4: 'Excellent' }
+  const LEVEL_LABEL: Record<number, string> = { 1: 'Needs improvement', 2: 'Occasional', 3: 'Class contribution', 4: 'Excellent' }
   const avgLevel = avg >= 63 ? 4 : avg >= 38 ? 3 : avg >= 13 ? 2 : 1
   return { avg, score: totalScore, label: LEVEL_LABEL[avgLevel] }
 }
