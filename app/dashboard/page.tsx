@@ -2,10 +2,10 @@ import PrincipalShell from '@/components/layout/PrincipalShell'
 import Link from 'next/link'
 import {
   getInstitutionHealth, getCriticalAlerts, getCourses, getCourseAverageAttendance,
-  getPresentTodayCount, getAbsentTodayCount, getStudents, getAttendanceRate
+  getPresentTodayCount, getAbsentTodayCount, getStudents, getAttendanceRate, getStudentsForCourse
 } from '@/lib/mock-data'
 import ProgressNebula from '@/components/ui/ProgressNebula'
-import { TreeStructure, Cpu, Cloud, Palette, ChartLine } from '@phosphor-icons/react/dist/ssr'
+import { TreeStructure, Cpu, Cloud, Palette, ChartLine, TrendUp, WarningCircle, EnvelopeSimple, Plus } from '@phosphor-icons/react/dist/ssr'
 import type { Icon } from '@phosphor-icons/react/dist/lib/types'
 
 // Map course IDs to subject icons
@@ -68,8 +68,25 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* KPI Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        {/* Mobile hero card */}
+        <section className="md:hidden relative overflow-hidden p-8 rounded-3xl bg-gradient-to-br from-surface-container-high to-surface">
+          {/* ambient glow */}
+          <div className="absolute -top-12 -right-12 w-48 h-48 bg-primary/10 blur-[64px] rounded-full" />
+          <div className="relative z-10 flex flex-col items-center">
+            <span className="font-label text-on-surface-variant uppercase tracking-[0.2em] text-[10px] mb-2 font-semibold">Current Semester Performance</span>
+            <div className="flex items-baseline gap-1">
+              <span className="text-7xl font-extrabold tracking-tighter text-primary font-headline">{health}</span>
+              <span className="text-3xl font-bold text-primary-dim font-headline">%</span>
+            </div>
+            <div className="mt-6 flex items-center gap-2 px-4 py-1.5 bg-secondary/10 rounded-full border border-secondary/20">
+              <TrendUp size={14} className="text-secondary" />
+              <span className="text-secondary font-medium text-xs font-label">+2.4% from last month</span>
+            </div>
+          </div>
+        </section>
+
+        {/* KPI Grid — desktop only */}
+        <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {kpis.map((kpi) => (
             <div key={kpi.label} className="bg-surface-container-high rounded-xl p-5 md:p-6 relative overflow-hidden group">
               <div className={`absolute top-0 right-0 w-32 h-32 ${kpi.glow} rounded-full -mr-16 -mt-16 blur-3xl`} />
@@ -85,8 +102,78 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        {/* Secondary grid: courses + alerts */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Mobile critical alerts */}
+        <section className="md:hidden space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold font-headline flex items-center gap-2">
+              <WarningCircle size={20} className="text-error" weight="fill" />
+              Critical Alerts
+            </h2>
+            <span className="text-xs font-medium text-error bg-error/10 px-2.5 py-1 rounded-md font-label">{alerts.length} Actions Needed</span>
+          </div>
+          <div className="space-y-3">
+            {enrichedAlerts.map(a => (
+              <Link key={`mob-${a.studentId}-${a.courseId}`} href={`/students/${a.studentId}`}
+                className="p-4 bg-surface-container-low rounded-2xl flex items-center gap-4 border-l-4 border-error hover:bg-surface-container-high transition-colors">
+                <div className="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center text-sm font-headline font-bold text-primary ring-2 ring-error/10 shrink-0">
+                  {a.studentName.split(' ').map((n: string) => n[0]).join('')}
+                </div>
+                <div className="flex-grow min-w-0">
+                  <h4 className="font-semibold text-sm text-on-surface">{a.studentName}</h4>
+                  <p className="text-xs text-on-surface-variant font-label">{a.absent} consecutive absences • {a.courseName}</p>
+                </div>
+                <div className="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-highest text-error shrink-0">
+                  <EnvelopeSimple size={16} />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* Mobile course cards */}
+        <section className="md:hidden space-y-4">
+          <h2 className="text-lg font-bold font-headline">Recent Course Attendance</h2>
+          <div className="space-y-4">
+            {courses.map(course => {
+              const avgRate = getCourseAverageAttendance(course.id)
+              const presentCount = Math.round((avgRate / 100) * getStudentsForCourse(course.id).length)
+              const totalCount = getStudentsForCourse(course.id).length
+              const { bar } = presenceBadgeClass(avgRate)
+              const statusLabel = avgRate >= 80 ? 'High Stability' : avgRate >= 65 ? 'Attention Required' : 'Critical'
+              const statusColor = avgRate >= 80 ? 'text-secondary' : avgRate >= 65 ? 'text-on-surface' : 'text-error'
+              const codeColor = avgRate >= 80 ? 'text-primary-dim' : avgRate >= 65 ? 'text-tertiary' : 'text-error'
+              const timeLabel = `${course.schedule.room} · ${course.schedule.time}`
+              return (
+                <Link key={`mob-${course.id}`} href={`/courses/${course.id}`}
+                  className="block p-5 bg-surface-container-highest rounded-3xl border border-outline-variant/10 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors" />
+                  <div className="flex justify-between items-start relative z-10">
+                    <div className="space-y-1">
+                      <span className={`text-[10px] font-bold uppercase tracking-wider font-label ${codeColor}`}>{course.id.toUpperCase()}</span>
+                      <h3 className="text-base font-bold text-on-surface font-headline">{course.name}</h3>
+                      <p className="text-xs text-on-surface-variant font-label">{timeLabel}</p>
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <span className={`text-xl font-bold font-headline ${statusColor}`}>{avgRate}%</span>
+                      <span className="text-[10px] text-on-surface-variant font-label">{statusLabel}</span>
+                    </div>
+                  </div>
+                  <div className="mt-6 space-y-2 relative z-10">
+                    <div className="h-1.5 w-full bg-surface-container-low rounded-full overflow-hidden">
+                      <div className={`h-full rounded-full ${bar}`} style={{ width: `${avgRate}%` }} />
+                    </div>
+                    <div className="flex justify-between text-[10px] font-medium text-on-surface-variant font-label">
+                      <span>{presentCount}/{totalCount} Students Present</span>
+                    </div>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        </section>
+
+        {/* Secondary grid: courses + alerts — desktop only */}
+        <div className="hidden md:grid grid-cols-1 lg:grid-cols-3 gap-8">
 
           {/* Course rows (2/3 width) */}
           <div className="lg:col-span-2 space-y-6">
@@ -181,6 +268,12 @@ export default function DashboardPage() {
 
         </div>
       </div>
+
+      {/* Mobile FAB */}
+      <Link href="/attend"
+        className="fixed bottom-24 right-6 z-40 md:hidden w-14 h-14 bg-gradient-to-br from-primary to-primary-container rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 active:scale-95 transition-transform">
+        <Plus size={28} className="text-on-primary" weight="bold" />
+      </Link>
     </PrincipalShell>
   )
 }
