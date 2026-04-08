@@ -70,7 +70,7 @@ export default function TeacherCard({ teacher, classes, sessions, sessionsThisMo
       {/* Progress bars */}
       <div className="space-y-2">
         <div className="flex justify-between text-[10px] font-bold font-label uppercase tracking-widest text-on-surface-variant">
-          <span>Share of sessions taught</span>
+          <span>% of sessions taught</span>
           <span>{sessionPct}%</span>
         </div>
         <div className="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">

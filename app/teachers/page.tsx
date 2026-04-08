@@ -17,8 +17,8 @@ export default function TeachersPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
           <div>
-            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight font-headline text-on-surface mb-2">Instructors</h1>
-            <p className="text-on-surface-variant font-label text-sm">{teachers.length} instructors across all classes</p>
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight font-headline text-on-surface mb-2">Teachers</h1>
+            <p className="text-on-surface-variant font-label text-sm">{teachers.length} teachers across all classes</p>
           </div>
         </div>
 

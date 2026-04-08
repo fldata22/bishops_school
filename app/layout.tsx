@@ -21,24 +21,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="text-on-surface font-body antialiased">
 
         {/* ── Ambient background layer ─────────────────────────────────────── */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 0, backgroundColor: '#060e20' }}>
-          {/* Indigo orb — top right */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 0, backgroundColor: '#080e1e' }}>
+          {/* Blue orb — top right */}
           <div className="absolute" style={{
             top: '-25%', right: '-12%',
             width: '900px', height: '900px',
-            background: 'radial-gradient(circle, rgba(163,166,255,0.22) 0%, rgba(163,166,255,0.06) 45%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(96,165,250,0.20) 0%, rgba(96,165,250,0.05) 45%, transparent 70%)',
           }} />
-          {/* Mint orb — bottom left */}
+          {/* Emerald orb — bottom left */}
           <div className="absolute" style={{
             bottom: '-22%', left: '-12%',
             width: '850px', height: '850px',
-            background: 'radial-gradient(circle, rgba(105,246,184,0.14) 0%, rgba(105,246,184,0.04) 45%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(52,211,153,0.14) 0%, rgba(52,211,153,0.04) 45%, transparent 70%)',
           }} />
           {/* Rose orb — bottom right */}
           <div className="absolute" style={{
             bottom: '-5%', right: '-8%',
             width: '650px', height: '650px',
-            background: 'radial-gradient(circle, rgba(255,157,209,0.12) 0%, rgba(255,157,209,0.03) 45%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(251,113,133,0.12) 0%, rgba(251,113,133,0.03) 45%, transparent 70%)',
           }} />
         </div>
 

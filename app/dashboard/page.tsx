@@ -41,23 +41,21 @@ export default function DashboardPage() {
           {/* Total students */}
           <div className="bg-surface-container-high rounded-2xl p-6 border border-outline-variant/5 relative overflow-hidden">
             <div className="absolute -top-6 -right-6 w-24 h-24 bg-secondary/10 blur-3xl rounded-full" />
-            <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant font-label mb-3">Students</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant font-label mb-3">Students Enrolled</p>
             <span className="text-5xl font-black font-headline text-secondary">{totalStudents}</span>
-            <p className="text-xs text-on-surface-variant font-label mt-2">Enrolled</p>
           </div>
 
           {/* Total teachers */}
           <div className="bg-surface-container-high rounded-2xl p-6 border border-outline-variant/5 relative overflow-hidden">
             <div className="absolute -top-6 -right-6 w-24 h-24 bg-tertiary/10 blur-3xl rounded-full" />
-            <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant font-label mb-3">Instructors</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant font-label mb-3">Teachers</p>
             <span className="text-5xl font-black font-headline text-tertiary">{teachers.length}</span>
-            <p className="text-xs text-on-surface-variant font-label mt-2">Teaching</p>
           </div>
         </div>
 
         {/* Teacher performance */}
         <section className="space-y-4">
-          <h2 className="text-lg font-bold font-headline">Instructor Performance</h2>
+          <h2 className="text-lg font-bold font-headline">Teacher Performance</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {teachers.map(teacher => {
               const rate = getTeacherAttendanceRate(teacher.id)

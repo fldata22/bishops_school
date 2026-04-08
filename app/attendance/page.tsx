@@ -46,7 +46,7 @@ export default function DashboardPage() {
     { label: 'Total Students',  value: totalStudents, secondary: null,          glow: 'bg-primary/5',   bar: 'bg-primary',   barWidth: '100%' },
     { label: 'Present Today',   value: presentToday,  secondary: `${health}%`,  glow: 'bg-secondary/5', bar: 'bg-secondary shadow-[0_0_8px_rgba(105,246,184,0.4)]', barWidth: `${health}%` },
     { label: 'Absent',          value: absentToday,   secondary: null,          glow: 'bg-error/5',     bar: 'bg-error',     barWidth: `${Math.round((absentToday / Math.max(totalStudents, 1)) * 100)}%` },
-    { label: 'Instructors', value: getTeachers().length, secondary: null, glow: 'bg-tertiary/5', bar: 'bg-tertiary', barWidth: '100%' },
+    { label: 'Teachers', value: getTeachers().length, secondary: null, glow: 'bg-tertiary/5', bar: 'bg-tertiary', barWidth: '100%' },
   ]
 
   return (
@@ -290,7 +290,7 @@ export default function DashboardPage() {
 
             {/* Teacher performance */}
             <div className="space-y-4 mt-8">
-              <h3 className="text-lg font-bold font-headline">Instructor Activity</h3>
+              <h3 className="text-lg font-bold font-headline">Teacher Activity</h3>
               <div className="space-y-3">
                 {getTeachers().map(teacher => {
                   const teacherSessions = getSessionsByTeacher(teacher.id)

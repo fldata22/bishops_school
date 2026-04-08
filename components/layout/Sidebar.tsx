@@ -10,7 +10,7 @@ const navItems = [
   { href: '/attendance', label: 'Attendance', Icon: CalendarCheck },
   { href: '/courses',    label: 'Modules',    Icon: BookOpen },
   { href: '/students',   label: 'Students',   Icon: Users },
-  { href: '/teachers',   label: 'Instructors',Icon: ChalkboardTeacher },
+  { href: '/teachers',   label: 'Teachers',   Icon: ChalkboardTeacher },
 ]
 
 export default function Sidebar({ currentPath }: { currentPath: string }) {

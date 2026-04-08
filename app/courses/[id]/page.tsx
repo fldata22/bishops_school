@@ -228,7 +228,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
             {primaryTeacher && (
               <div className="flex items-center gap-2 text-on-surface-variant">
                 <User size={16} />
-                <span className="text-sm font-label font-medium">Instructor: {primaryTeacher.name}</span>
+                <span className="text-sm font-label font-medium">Teacher: {primaryTeacher.name}</span>
               </div>
             )}
           </section>

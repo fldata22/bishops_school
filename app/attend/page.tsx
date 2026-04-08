@@ -2,7 +2,7 @@
 import { useState, useMemo } from 'react'
 import {
   getTeachers, getTeacherModuleAssignments, getStudentsByClass,
-  getClassById, getModuleById, submitSession
+  getClassById, getModules, getModuleById, submitSession
 } from '@/lib/mock-data'
 import type { Student } from '@/lib/types'
 import StudentToggleList from '@/components/attend/StudentToggleList'
@@ -12,8 +12,11 @@ export default function AttendPage() {
   const teachers = getTeachers()
   const allAssignments = getTeacherModuleAssignments()
 
+  const allModules = getModules()
+
   const [teacherId, setTeacherId] = useState('')
   const [classId, setClassId] = useState('')
+  const [moduleId, setModuleId] = useState('')
   const [topicIndex, setTopicIndex] = useState<number | ''>('')
   const [statuses, setStatuses] = useState<Record<string, 'present' | 'absent'>>({})
   const [error, setError] = useState('')
@@ -29,16 +32,10 @@ export default function AttendPage() {
     return classIds.map(id => getClassById(id)).filter(Boolean) as NonNullable<ReturnType<typeof getClassById>>[]
   }, [teacherId, allAssignments])
 
-  // Module + topics for the selected teacher+class
-  const assignment = useMemo(() => {
-    if (!teacherId || !classId) return undefined
-    return allAssignments.find(a => a.teacherId === teacherId && a.classId === classId)
-  }, [teacherId, classId, allAssignments])
-
   const moduleTopics = useMemo(() => {
-    if (!assignment) return []
-    return getModuleById(assignment.moduleId)?.topics ?? []
-  }, [assignment])
+    if (!moduleId) return []
+    return getModuleById(moduleId)?.topics ?? []
+  }, [moduleId])
 
   const students: Student[] = useMemo(() => {
     if (!classId) return []
@@ -48,6 +45,7 @@ export default function AttendPage() {
   function handleTeacherChange(id: string) {
     setTeacherId(id)
     setClassId('')
+    setModuleId('')
     setTopicIndex('')
     setStatuses({})
     setError('')
@@ -55,6 +53,7 @@ export default function AttendPage() {
 
   function handleClassChange(id: string) {
     setClassId(id)
+    setModuleId('')
     setTopicIndex('')
     setError('')
     const s = getStudentsByClass(id)
@@ -66,12 +65,11 @@ export default function AttendPage() {
   }
 
   function handleSubmit() {
-    if (!teacherId || !classId || topicIndex === '') return
-    if (!assignment) { setError('No module assignment found.'); return }
+    if (!teacherId || !classId || !moduleId || topicIndex === '') return
     const today = new Date().toISOString().split('T')[0]
     const result = submitSession({
       classId,
-      moduleId: assignment.moduleId,
+      moduleId,
       teacherId,
       date: today,
       topicIndex: topicIndex as number,
@@ -85,6 +83,7 @@ export default function AttendPage() {
 
   function handleSubmitAnother() {
     setClassId('')
+    setModuleId('')
     setTopicIndex('')
     setStatuses({})
     setError('')
@@ -110,7 +109,7 @@ export default function AttendPage() {
 
       {/* Teacher selector */}
       <div className="flex flex-col gap-1.5 mb-4">
-        <label className="text-xs font-label text-on-surface-variant uppercase tracking-wider">Instructor</label>
+        <label className="text-xs font-label text-on-surface-variant uppercase tracking-wider">Teacher</label>
         <select
           value={teacherId}
           onChange={e => handleTeacherChange(e.target.value)}
@@ -137,13 +136,29 @@ export default function AttendPage() {
         </select>
       </div>
 
+      {/* Module selector */}
+      <div className="flex flex-col gap-1.5 mb-4">
+        <label className="text-xs font-label text-on-surface-variant uppercase tracking-wider">Module</label>
+        <select
+          value={moduleId}
+          onChange={e => { setModuleId(e.target.value); setTopicIndex(''); setError('') }}
+          disabled={!classId}
+          className="bg-surface-container-lowest border border-outline-variant/40 rounded-xl px-4 py-3 text-sm font-label text-on-surface outline-none focus:border-primary transition-all duration-200 appearance-none disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          <option value="">Select module…</option>
+          {allModules.map(m => (
+            <option key={m.id} value={m.id}>{m.name}</option>
+          ))}
+        </select>
+      </div>
+
       {/* Topic selector */}
       <div className="flex flex-col gap-1.5 mb-6">
         <label className="text-xs font-label text-on-surface-variant uppercase tracking-wider">Topic</label>
         <select
           value={topicIndex}
           onChange={e => { setTopicIndex(e.target.value === '' ? '' : Number(e.target.value)); setError('') }}
-          disabled={!classId || moduleTopics.length === 0}
+          disabled={!moduleId || moduleTopics.length === 0}
           className="bg-surface-container-lowest border border-outline-variant/40 rounded-xl px-4 py-3 text-sm font-label text-on-surface outline-none focus:border-primary transition-all duration-200 appearance-none disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <option value="">Select topic…</option>

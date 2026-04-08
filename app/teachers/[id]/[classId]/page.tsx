@@ -61,7 +61,7 @@ export default function TeacherClassBreakdownPage({ params }: { params: { id: st
         {/* Back */}
         <Link href="/teachers" className="inline-flex items-center gap-1.5 text-xs font-label text-on-surface-variant hover:text-primary transition-colors mb-6">
           <CaretLeft size={14} />
-          Instructors
+          Teachers
         </Link>
 
         {/* Hero */}
