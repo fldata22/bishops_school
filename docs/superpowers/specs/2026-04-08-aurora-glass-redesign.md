@@ -20,22 +20,53 @@ All existing functionality is preserved. Layout improvements are included alongs
 
 Replace all existing custom colours with the following:
 
-| Token | Value | Use |
+| Token | Value | Tailwind usage note |
 |---|---|---|
-| `background` | `#07070f` | Page background |
-| `surface` | `rgba(255,255,255,0.04)` | Glass card base |
-| `surface-high` | `rgba(255,255,255,0.07)` | Elevated / active cards |
-| `surface-container` | `rgba(255,255,255,0.03)` | Subtle containers |
-| `primary` | `#7c3aed` | Violet — CTAs, active states, glows |
-| `primary-dim` | `#a78bfa` | Violet — text on dark, shimmer accents |
-| `secondary` | `#06b6d4` | Cyan — positive metrics, progress fills |
-| `secondary-dim` | `#22d3ee` | Cyan — lighter fills, shimmer |
-| `tertiary` | `#f43f5e` | Rose — alerts, flags, absent indicators |
-| `tertiary-dim` | `#fb7185` | Rose — lighter, text on dark |
-| `on-surface` | `#f0eeff` | Primary text |
-| `on-surface-variant` | `rgba(240,238,255,0.45)` | Secondary / muted text |
-| `outline` | `rgba(255,255,255,0.08)` | Card borders |
-| `outline-variant` | `rgba(255,255,255,0.05)` | Subtle dividers |
+| `background` | `#07070f` | `bg-background` |
+| `surface` | `#ffffff` | Always used with opacity modifier — e.g. `bg-surface/4` = glass base, `bg-surface/7` = elevated |
+| `surface-high` | `#ffffff` | Alias for `surface` at higher opacity; use `bg-surface/7` |
+| `surface-container` | `#ffffff` | Use `bg-surface/3` |
+| `primary` | `#7c3aed` | `bg-primary`, `text-primary`, `border-primary/28` etc. |
+| `primary-dim` | `#a78bfa` | `text-primary-dim`, shimmer accents |
+| `secondary` | `#06b6d4` | `bg-secondary`, progress fills |
+| `secondary-dim` | `#22d3ee` | Lighter fills |
+| `tertiary` | `#f43f5e` | Alerts, flags |
+| `tertiary-dim` | `#fb7185` | Text on dark for alerts |
+| `on-surface` | `#f0eeff` | `text-on-surface` |
+| `on-surface-variant` | `#f0eeff` | Always used with opacity — `text-on-surface-variant/45` |
+| `outline` | `#ffffff` | Always used with opacity — `border-outline/8` |
+| `outline-variant` | `#ffffff` | `border-outline-variant/5` |
+
+> **Note on opacity modifiers:** Tailwind v3's `/N` modifier syntax requires tokens to be defined as plain hex or RGB (without a built-in alpha). All "surface", "outline", and "on-surface-variant" tokens are therefore stored as opaque hex and transparency is applied at usage sites via the modifier (e.g. `bg-surface/4`, `border-outline/8`). Never define these tokens as `rgba(...)` in `tailwind.config.ts` — Tailwind cannot apply a second alpha layer to an already-transparent value.
+
+### 1.1.1 Token Migration Map
+
+Every old MD3 token must be replaced at all usage sites. The full substitution table:
+
+| Old token | Replacement | Notes |
+|---|---|---|
+| `error` | `tertiary` | Rose — same semantic role |
+| `error-container` | `tertiary/10` | Use opacity modifier |
+| `on-error` | `tertiary-dim` | |
+| `on-primary` | `white` | Use `text-white` |
+| `primary-container` | `secondary` | Cyan — used for gradient ends |
+| `on-primary-container` | `on-surface` | |
+| `secondary-container` | `secondary/15` | |
+| `on-secondary` | `white` | Use `text-white`; cyan is dark enough for white text |
+| `on-secondary-container` | `secondary-dim` | |
+| `tertiary-container` | `tertiary/15` | |
+| `on-tertiary-container` | `tertiary-dim` | |
+| `surface-container-lowest` | `bg-surface/2` | Track backgrounds, subtle fills |
+| `surface-container-low` | `bg-surface/3` | |
+| `surface-container` | `bg-surface/4` | Default glass base |
+| `surface-container-high` | `bg-surface/5` | Row hover backgrounds |
+| `surface-container-highest` | `bg-surface/7` | Elevated cards |
+| `surface-bright` | `bg-surface/8` | Brightest surface — active rows |
+| `surface-dim` | `bg-surface/3` | |
+| `on-surface-variant` | `on-surface-variant/45` | Always with opacity modifier |
+| `outline-variant` | `outline-variant/5` | |
+
+> **Reading the Replacement column:** Values prefixed with `bg-` (e.g. `bg-surface/4`) are complete Tailwind utility classes — include the `bg-` prefix verbatim. Values without a prefix (e.g. `tertiary`, `secondary-dim`) are bare token names; combine with the appropriate utility prefix (`bg-`, `text-`, `border-`) as required by the call site.
 
 **Attendance threshold colours:**
 - ≥ 80%: `secondary` (cyan)
@@ -54,19 +85,23 @@ const display = Bricolage_Grotesque({
   subsets: ['latin'],
   variable: '--font-display',
   weight: ['300', '400', '500', '600', '700', '800'],
+  display: 'swap',
 })
 
 const body = DM_Sans({
   subsets: ['latin'],
   variable: '--font-body',
   weight: ['300', '400', '500', '600', '700'],
+  display: 'swap',
 })
 ```
 
 Tailwind font families:
 - `font-headline` → `var(--font-display)` (Bricolage Grotesque)
 - `font-body` → `var(--font-body)` (DM Sans)
-- `font-label` → `var(--font-body)` (DM Sans, uppercase tracking)
+- `font-label` → `var(--font-body)` (DM Sans)
+
+> **`font-label` usage:** The `fontFamily` token only sets the typeface. Call sites must still add `uppercase tracking-widest text-xs` manually where a label style is needed — this mirrors the existing pattern in the codebase.
 
 ### 1.3 Aurora Background System
 
@@ -94,11 +129,14 @@ Content sits in a `relative z-10` wrapper over the orbs.
 Reusable pattern applied to all card components:
 
 ```
-background: rgba(255,255,255,0.04)
+background: rgba(255,255,255,0.04)   → Tailwind: bg-surface/4
 backdrop-filter: blur(12px)
-border: 1px solid rgba(255,255,255,0.08)
+-webkit-backdrop-filter: blur(12px)  ← required for Safari / iOS
+border: 1px solid rgba(255,255,255,0.08)  → Tailwind: border border-outline/8
 border-radius: 14px (cards) / 10px (rows)
 ```
+
+> **Safari compatibility:** Every `backdrop-filter` value in this spec must be paired with `-webkit-backdrop-filter` (identical value). In React inline styles, set both `backdropFilter` and `WebkitBackdropFilter`. When using Tailwind's `backdrop-blur-*` utilities (preferred), both prefixes are emitted automatically — prefer `backdrop-blur-md` over inline styles.
 
 **Shimmer top border** (pseudo-element `::before`, `height: 1px`):
 - Default (violet): `linear-gradient(90deg, transparent, rgba(167,139,250,0.5), transparent)`
@@ -119,7 +157,7 @@ border-radius: 14px (cards) / 10px (rows)
 
 ### 2.2 Desktop Sidebar (`components/layout/Sidebar.tsx`)
 
-- **No logo or wordmark** — nav items start at the top
+- **Remove the entire logo `<div>` block** (including the `<GraduationCap>` icon and any `text-on-primary` usage within it) — nav items start at the top with no preceding element
 - Background: `rgba(255,255,255,0.025)` + `backdrop-filter: blur(24px)`
 - Right border: `1px solid rgba(255,255,255,0.06)`
 - Nav item inactive: `text-on-surface-variant`, no background, `font-body text-sm font-medium`
@@ -165,9 +203,10 @@ Mobile: stacks vertically — ring card full-width first, then 2-col satellite r
 
 ### 3.3 Course Detail (`app/courses/[id]/page.tsx`)
 
-- Student table rows: glass base (`bg-surface/50`), `hover:bg-surface-high` with `transition-colors`, separated by `border-b border-outline-variant` (no solid borders)
+- Student table rows: glass base (`bg-surface/4`), `hover:bg-surface/7` with `transition-colors`, separated by `border-b border-outline-variant/5` (no solid borders)
 - `StatusBadge` — Present: `bg-secondary/15 border-secondary/25 text-secondary-dim` + `box-shadow: 0 0 8px rgba(6,182,212,0.2)`; Absent: `bg-tertiary/15 border-tertiary/25 text-tertiary-dim` + rose glow
 - Topic progress bars: `bg-gradient-to-r from-secondary to-primary-dim`
+- CTA / action button gradient: update `from-primary to-primary-container text-on-primary` → `from-primary to-secondary text-white`
 
 ### 3.4 Students Directory (`app/students/page.tsx`)
 
@@ -178,14 +217,22 @@ Mobile: stacks vertically — ring card full-width first, then 2-col satellite r
 ### 3.5 Attendance Taking (`app/attend/page.tsx`)
 
 - Student toggle rows: glass cards, toggled-present = `border-secondary/40 bg-secondary/5` with cyan glow; toggled-absent = `border-tertiary/40 bg-tertiary/5` with rose glow
-- Submit / confirm FAB: `bg-gradient-to-r from-primary to-secondary text-white shadow-[0_4px_20px_rgba(124,58,237,0.4)]`
+- Submit / confirm FAB: `bg-gradient-to-r from-primary to-secondary text-white shadow-[0_4px_20px_rgba(124,58,237,0.4)]` — replace existing `text-on-primary` on the FAB icon with `text-white`
 
 ### 3.6 Teachers (`app/teachers/page.tsx`)
 
 - Teacher cards: glass panel, same treatment as student cards
 - Attendance metric: cyan progress ring
 
-### 3.7 Shared Components
+### 3.7 Student Detail (`app/students/[id]/page.tsx`)
+
+Token migration only (no layout redesign): replace all `surface-container-*`, `error`, `error-container`, `on-primary`, `primary-container`, `secondary-container`, `on-secondary` tokens with their equivalents from Section 1.1.1. Apply glass card mixin to any card/stat containers.
+
+### 3.8 Teacher Detail (`app/teachers/[id]/[classId]/page.tsx`)
+
+Token migration only: replace `surface-container-highest` → `bg-surface/7`, `error` → `tertiary`. No layout changes.
+
+### 3.9 Shared Components
 
 | Component | Change |
 |---|---|
@@ -193,7 +240,7 @@ Mobile: stacks vertically — ring card full-width first, then 2-col satellite r
 | `ProgressNebula` | Stroke colours → `secondary` (cyan), `primary-dim` (violet), `tertiary` (rose) |
 | `CourseCard` | Full glass treatment, gradient progress bar |
 | `StatPill` | Glass background, Bricolage Grotesque value font |
-| `CriticalAlertCard` | Rose glass (`bg-tertiary/5`), glowing left border |
+| `CriticalAlertCard` | Rose glass (`bg-tertiary/5`), glowing left border; hover: `hover:bg-surface/8` (replaces `hover:bg-surface-bright`) |
 | `TeacherCard` | Glass panel, remove solid background |
 
 ---
@@ -213,12 +260,16 @@ Mobile: stacks vertically — ring card full-width first, then 2-col satellite r
 | `app/courses/[id]/page.tsx` | Glass table, glow badges |
 | `app/students/page.tsx` | Glass cards, attendance rings |
 | `app/attend/page.tsx` | Glow toggle rows, gradient FAB |
+| `components/attend/StudentToggleList.tsx` | Glass toggle rows, cyan/rose glow states; replace `surface-container-high` → `bg-surface/5`, `surface-bright` → `bg-surface/8` |
+| `components/attend/SuccessScreen.tsx` | Replace `primary-container` → `secondary`, `text-on-primary` → `text-white` |
 | `app/teachers/page.tsx` | Glass cards |
+| `app/students/[id]/page.tsx` | Token migration (surface-container-*, error, error-container, on-primary, primary-container, secondary-container, on-secondary); glass treatment |
+| `app/teachers/[id]/[classId]/page.tsx` | Token migration (surface-container-highest, error); glass treatment |
 | `components/ui/StatusBadge.tsx` | Glow variants |
 | `components/ui/ProgressNebula.tsx` | Colour remapping |
 | `components/ui/CourseCard.tsx` | Glass treatment |
 | `components/ui/StatPill.tsx` | Glass + display font |
-| `components/ui/CriticalAlertCard.tsx` | Rose glass |
+| `components/ui/CriticalAlertCard.tsx` | Rose glass (`bg-tertiary/5`), glowing left border, hover: `bg-surface/8` (replaces `surface-bright`) |
 | `components/teachers/TeacherCard.tsx` | Glass panel |
 
 ---
@@ -227,6 +278,6 @@ Mobile: stacks vertically — ring card full-width first, then 2-col satellite r
 
 - `app/login/page.tsx` — not redesigned in this pass
 - `app/reports/page.tsx` — stub page, not redesigned
-- `app/attendance/page.tsx` — secondary attendance overview, not in scope unless trivial
+- `app/attendance/page.tsx` — secondary attendance overview page; contains `text-on-primary` and `error` token usage but is excluded from this pass. Old tokens will remain broken until a follow-up pass.
 - No functional changes — all data fetching, routing, and business logic unchanged
 - No new pages or features
