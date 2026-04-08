@@ -28,12 +28,12 @@ export default function DashboardPage() {
         {/* Top stat cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {/* Overall attendance */}
-          <div className="col-span-2 bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl p-6 border border-primary/10 relative overflow-hidden">
-            <div className="absolute -top-8 -right-8 w-32 h-32 bg-primary/10 blur-3xl rounded-full" />
-            <p className="text-[10px] font-bold uppercase tracking-widest text-primary-dim font-label mb-3">Overall Attendance</p>
+          <div className="col-span-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl p-6 border border-primary/20 relative overflow-hidden">
+            <div className="absolute -top-8 -right-8 w-32 h-32 bg-primary/20 blur-3xl rounded-full" />
+            <p className="text-[10px] font-bold uppercase tracking-widest text-primary font-label mb-3">Overall Attendance</p>
             <div className="flex items-baseline gap-1">
-              <span className="text-6xl font-black font-headline text-primary">{overallRate}</span>
-              <span className="text-2xl font-bold text-primary-dim font-headline">%</span>
+              <span className="text-6xl font-black font-headline text-on-surface">{overallRate}</span>
+              <span className="text-2xl font-bold text-on-surface-variant font-headline">%</span>
             </div>
             <p className="text-xs text-on-surface-variant font-label mt-2">Across all modules and classes</p>
           </div>
