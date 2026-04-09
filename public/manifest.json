@@ -2,7 +2,7 @@
   "name": "Course Tracker",
   "short_name": "Attendance",
   "description": "Track student attendance across courses",
-  "start_url": "/attend",
+  "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#060e20",
   "theme_color": "#060e20",
