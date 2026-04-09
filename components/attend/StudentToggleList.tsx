@@ -26,12 +26,21 @@ export default function StudentToggleList({ students, statuses, onToggle }: Prop
     <motion.div className="flex flex-col gap-2" initial="hidden" animate="visible" variants={container}>
       {students.map(student => {
         const status = statuses[student.id] ?? 'present'
+        const isAbsent = status === 'absent'
         return (
           <motion.div key={student.id} variants={item}>
-            <button onClick={() => onToggle(student.id)}
-              className={`w-full flex items-center gap-3 p-4 rounded-xl text-left transition-all duration-200 active:scale-[0.98]
-                ${status === 'absent' ? 'bg-tertiary/5 border border-tertiary/20' : 'bg-surface-container-high border border-transparent hover:bg-surface-bright'}`}>
-              <div className="w-9 h-9 rounded-full overflow-hidden border border-outline-variant/20 shrink-0">
+            <button
+              onClick={() => onToggle(student.id)}
+              className="w-full flex items-center gap-3 p-4 rounded-xl text-left transition-all duration-200 active:scale-[0.98] border"
+              style={{
+                background: isAbsent ? 'rgba(244,63,94,0.06)' : 'rgba(255,255,255,0.04)',
+                borderColor: isAbsent ? 'rgba(244,63,94,0.25)' : 'rgba(255,255,255,0.07)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+                boxShadow: isAbsent ? '0 0 12px rgba(244,63,94,0.1)' : undefined,
+              }}
+            >
+              <div className="w-9 h-9 rounded-full overflow-hidden border border-white/[0.08] shrink-0">
                 <Image
                   src={getStudentAvatarUrl(student.id)}
                   alt={student.name}
