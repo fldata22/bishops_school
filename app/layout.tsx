@@ -1,9 +1,20 @@
 import type { Metadata, Viewport } from 'next'
-import { Manrope, Inter } from 'next/font/google'
+import { Bricolage_Grotesque, DM_Sans } from 'next/font/google'
 import './globals.css'
 
-const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope', display: 'swap' })
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })
+const display = Bricolage_Grotesque({
+  subsets: ['latin'],
+  variable: '--font-display',
+  weight: ['300', '400', '500', '600', '700', '800'],
+  display: 'swap',
+})
+
+const body = DM_Sans({
+  subsets: ['latin'],
+  variable: '--font-body',
+  weight: ['300', '400', '500', '600', '700'],
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'School Attendance',
@@ -12,33 +23,45 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#060e20',
+  themeColor: '#07070f',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`dark ${manrope.variable} ${inter.variable}`}>
-      <body className="text-on-surface font-body antialiased">
+    <html lang="en" className={`dark ${display.variable} ${body.variable}`}>
+      <body className="text-on-surface font-body antialiased" style={{ backgroundColor: '#07070f' }}>
 
-        {/* ── Ambient background layer ─────────────────────────────────────── */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 0, backgroundColor: '#080e1e' }}>
-          {/* Blue orb — top right */}
-          <div className="absolute" style={{
-            top: '-25%', right: '-12%',
-            width: '900px', height: '900px',
-            background: 'radial-gradient(circle, rgba(96,165,250,0.20) 0%, rgba(96,165,250,0.05) 45%, transparent 70%)',
+        {/* ── Aurora background layer ───────────────────────────────────────── */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 0 }}>
+          {/* Violet orb — top right */}
+          <div style={{
+            position: 'absolute',
+            top: '-15%', right: '-8%',
+            width: '500px', height: '500px',
+            borderRadius: '50%',
+            background: 'radial-gradient(ellipse, rgba(124,58,237,0.55) 0%, transparent 70%)',
+            filter: 'blur(90px)',
+            animation: 'aurora-float-1 10s ease-in-out infinite',
           }} />
-          {/* Emerald orb — bottom left */}
-          <div className="absolute" style={{
-            bottom: '-22%', left: '-12%',
-            width: '850px', height: '850px',
-            background: 'radial-gradient(circle, rgba(52,211,153,0.14) 0%, rgba(52,211,153,0.04) 45%, transparent 70%)',
+          {/* Cyan orb — bottom left */}
+          <div style={{
+            position: 'absolute',
+            bottom: '-18%', left: '-8%',
+            width: '420px', height: '420px',
+            borderRadius: '50%',
+            background: 'radial-gradient(ellipse, rgba(6,182,212,0.35) 0%, transparent 70%)',
+            filter: 'blur(90px)',
+            animation: 'aurora-float-2 13s ease-in-out infinite',
           }} />
-          {/* Rose orb — bottom right */}
-          <div className="absolute" style={{
-            bottom: '-5%', right: '-8%',
-            width: '650px', height: '650px',
-            background: 'radial-gradient(circle, rgba(251,113,133,0.12) 0%, rgba(251,113,133,0.03) 45%, transparent 70%)',
+          {/* Rose orb — center right */}
+          <div style={{
+            position: 'absolute',
+            top: '35%', right: '15%',
+            width: '340px', height: '340px',
+            borderRadius: '50%',
+            background: 'radial-gradient(ellipse, rgba(244,63,94,0.25) 0%, transparent 70%)',
+            filter: 'blur(90px)',
+            animation: 'aurora-float-3 9s ease-in-out infinite',
           }} />
         </div>
 

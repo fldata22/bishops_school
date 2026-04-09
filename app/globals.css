@@ -3,9 +3,27 @@
 @tailwind utilities;
 
 @layer base {
-  body { font-family: var(--font-inter), sans-serif; }
-  h1, h2, h3, h4, h5, h6 { font-family: var(--font-manrope), sans-serif; }
+  body {
+    font-family: var(--font-body), sans-serif;
+    background-color: #07070f;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display), sans-serif;
+  }
   ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: #060e20; }
-  ::-webkit-scrollbar-thumb { background: #40485d; border-radius: 10px; }
+  ::-webkit-scrollbar-track { background: #07070f; }
+  ::-webkit-scrollbar-thumb { background: #2d1f5e; border-radius: 10px; }
+}
+
+@keyframes aurora-float-1 {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50%       { transform: translateY(-24px) scale(1.04); }
+}
+@keyframes aurora-float-2 {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50%       { transform: translateY(20px) scale(1.06); }
+}
+@keyframes aurora-float-3 {
+  0%, 100% { transform: translateY(0px) translateX(0px); }
+  50%       { transform: translateY(-16px) translateX(12px); }
 }

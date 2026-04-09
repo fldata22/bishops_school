@@ -6,55 +6,31 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        'background':                '#080e1e',
-        'surface':                   '#080e1e',
-        'surface-dim':               '#080e1e',
-        'surface-container-lowest':  '#020509',
-        'surface-container-low':     '#0d1730',
-        'surface-container':         '#121e38',
-        'surface-container-high':    '#172440',
-        'surface-container-highest': '#1d2b4d',
-        'surface-bright':            '#233158',
-        'surface-variant':           '#1d2b4d',
-        'on-surface':                '#f0f4ff',
-        'on-surface-variant':        '#94a3b8',
-        'on-background':             '#f0f4ff',
-        'outline':                   '#475569',
-        'outline-variant':           '#334155',
-        'primary':                   '#60a5fa',
-        'primary-container':         '#3b82f6',
-        'primary-dim':               '#2563eb',
-        'primary-fixed':             '#3b82f6',
-        'primary-fixed-dim':         '#2563eb',
-        'on-primary':                '#0c1a2e',
-        'on-primary-container':      '#dbeafe',
-        'inverse-primary':           '#1d4ed8',
-        'surface-tint':              '#60a5fa',
-        'secondary':                 '#34d399',
-        'secondary-dim':             '#10b981',
-        'secondary-container':       '#065f46',
-        'secondary-fixed':           '#34d399',
-        'secondary-fixed-dim':       '#10b981',
-        'on-secondary':              '#022c22',
-        'on-secondary-container':    '#d1fae5',
-        'on-secondary-fixed':        '#022c22',
-        'on-secondary-fixed-variant':'#065f46',
-        'tertiary':                  '#fb7185',
-        'tertiary-dim':              '#f43f5e',
-        'tertiary-container':        '#9f1239',
-        'tertiary-fixed':            '#fb7185',
-        'tertiary-fixed-dim':        '#f43f5e',
-        'on-tertiary':               '#4c0519',
-        'on-tertiary-container':     '#ffe4e6',
-        'on-tertiary-fixed':         '#4c0519',
-        'on-tertiary-fixed-variant': '#9f1239',
-        'error':                     '#f87171',
-        'error-dim':                 '#ef4444',
-        'error-container':           '#991b1b',
-        'on-error':                  '#450a0a',
-        'on-error-container':        '#fee2e2',
-        'inverse-surface':           '#f8fafc',
-        'inverse-on-surface':        '#334155',
+        // ── Aurora Glass palette ──────────────────────────────────────────
+        'background':          '#07070f',
+
+        // Surface tokens — always used with opacity modifier e.g. bg-surface/4
+        'surface':             '#ffffff',
+        'surface-high':        '#ffffff',
+        'surface-container':   '#ffffff',
+        'outline':             '#ffffff',
+        'outline-variant':     '#ffffff',
+        'on-surface-variant':  '#f0eeff',
+
+        // Primary text
+        'on-surface':          '#f0eeff',
+
+        // Violet
+        'primary':             '#7c3aed',
+        'primary-dim':         '#a78bfa',
+
+        // Cyan
+        'secondary':           '#06b6d4',
+        'secondary-dim':       '#22d3ee',
+
+        // Rose
+        'tertiary':            '#f43f5e',
+        'tertiary-dim':        '#fb7185',
       },
       borderRadius: {
         DEFAULT: '0.375rem',
@@ -67,9 +43,9 @@ const config: Config = {
         full:    '9999px',
       },
       fontFamily: {
-        headline: ['Manrope', 'sans-serif'],
-        body:     ['Inter', 'sans-serif'],
-        label:    ['Inter', 'sans-serif'],
+        headline: ['var(--font-display)', 'sans-serif'],
+        body:     ['var(--font-body)', 'sans-serif'],
+        label:    ['var(--font-body)', 'sans-serif'],
       },
     },
   },
