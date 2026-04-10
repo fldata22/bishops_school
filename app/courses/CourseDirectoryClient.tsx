@@ -1,13 +1,13 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import type { Module } from '@/lib/types'
+import type { ApiModule } from '@/lib/api-types'
 import { MagnifyingGlass, BookOpen, Funnel } from '@phosphor-icons/react'
 import CourseCard from '@/components/ui/CourseCard'
 
 interface Props {
-  courses: Module[]
-  rates: Record<string, number>
+  courses: ApiModule[]
+  rates: Record<number, number>
 }
 
 export default function CourseDirectoryClient({ courses, rates }: Props) {

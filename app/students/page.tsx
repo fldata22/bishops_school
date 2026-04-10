@@ -1,11 +1,19 @@
 import PrincipalShell from '@/components/layout/PrincipalShell'
-import { getStudents, getClasses, getChurchById, getDenominationById, getAttendanceRate, getStudentAvatarUrl } from '@/lib/mock-data'
+import { api } from '@/lib/api'
 import Link from 'next/link'
 import Image from 'next/image'
 
-export default function StudentsPage() {
-  const allStudents = getStudents()
-  const classes = getClasses()
+function getStudentAvatarUrl(student: { id: number; image: string | null; gender: string | null }) {
+  if (student.image) return student.image
+  const gender = student.gender === 'female' ? 'girl' : 'boy'
+  return `https://avatar.iran.liara.run/public/${gender}?username=${student.id}`
+}
+
+export default async function StudentsPage() {
+  const [students, classes] = await Promise.all([
+    api.listStudents(),
+    api.listClasses(),
+  ])
 
   return (
     <PrincipalShell>
@@ -15,87 +23,74 @@ export default function StudentsPage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
           <div>
             <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight font-headline text-on-surface mb-2">Students</h1>
-            <p className="text-on-surface-variant/60 font-label text-sm">{allStudents.length} students across {classes.length} classes</p>
-          </div>
-          <div className="hidden md:flex gap-4">
-            {classes.map(cls => {
-              const count = allStudents.filter(s => s.classId === cls.id).length
-              return (
-                <div
-                  key={cls.id}
-                  className="px-5 py-3 rounded-xl border border-white/[0.07]"
-                  style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
-                >
-                  <span className="text-on-surface-variant/60 text-xs block mb-0.5 font-label">{cls.name} Class</span>
-                  <span className="text-2xl font-bold font-headline">{count}</span>
-                </div>
-              )
-            })}
+            <p className="text-on-surface-variant/60 font-label text-sm">{students.length} students across {classes.length} classes</p>
           </div>
         </div>
 
         {/* Classes */}
         <div className="space-y-12">
           {classes.map(cls => {
-            const classStudents = allStudents.filter(s => s.classId === cls.id)
+            const classStudents = students.filter(s => s.class_id === cls.id)
+            if (classStudents.length === 0) return null
+            const categoryLabel = cls.category === 'non_consecrated'
+              ? 'Non-Consecrated'
+              : cls.category === 'newly_consecrated'
+                ? 'Newly Consecrated'
+                : null
+
             return (
               <section key={cls.id}>
                 {/* Class header */}
-                <div className="flex items-center gap-3 mb-6">
+                <div className="flex items-center gap-3 mb-6 flex-wrap">
                   <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"
                     style={{ boxShadow: '0 0 12px rgba(124,58,237,0.2)' }}>
                     <span className="text-sm font-black text-primary-dim font-headline">{cls.name[0]}</span>
                   </div>
-                  <h2 className="text-xl font-bold font-headline">{cls.name} Class</h2>
+                  <h2 className="text-xl font-bold font-headline">{cls.name}</h2>
                   <span
-                    className="ml-2 text-xs font-label text-on-surface-variant/60 px-2.5 py-1 rounded-full border border-white/[0.07]"
+                    className="text-xs font-label text-on-surface-variant/60 px-2.5 py-1 rounded-full border border-white/[0.07]"
                     style={{ background: 'rgba(255,255,255,0.04)' }}
                   >
                     {classStudents.length} students
                   </span>
+                  {categoryLabel && (
+                    <span
+                      className="text-xs font-label text-primary-dim px-2.5 py-1 rounded-full border border-primary/20"
+                      style={{ background: 'rgba(124,58,237,0.08)' }}
+                    >
+                      {categoryLabel}
+                    </span>
+                  )}
                 </div>
 
                 {/* Student grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {classStudents.map(student => {
-                    const { rate } = getAttendanceRate(student.id)
-                    const church = getChurchById(student.churchId)
-                    const denomination = church ? getDenominationById(church.denominationId) : undefined
-                    const rateColor = rate >= 80 ? 'text-secondary-dim' : rate >= 65 ? 'text-primary-dim' : 'text-tertiary-dim'
-                    const progressGradient = rate >= 80 ? 'from-secondary to-secondary-dim' : rate >= 65 ? 'from-primary to-primary-dim' : 'from-tertiary to-tertiary-dim'
+                  {classStudents.map(student => (
+                    <Link
+                      key={student.id}
+                      href={`/students/${student.id}`}
+                      className="flex items-center gap-4 p-4 rounded-xl border border-white/[0.07] hover:border-white/[0.12] transition-all duration-200 group"
+                      style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
+                    >
+                      {/* Avatar */}
+                      <div className="w-12 h-12 rounded-full overflow-hidden border border-white/[0.08] shrink-0">
+                        <Image
+                          src={getStudentAvatarUrl(student)}
+                          alt={student.name}
+                          width={48}
+                          height={48}
+                          unoptimized={!!student.image}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
 
-                    return (
-                      <Link
-                        key={student.id}
-                        href={`/students/${student.id}`}
-                        className="flex items-center gap-4 p-4 rounded-xl border border-white/[0.07] hover:border-white/[0.12] transition-all duration-200 group"
-                        style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
-                      >
-                        {/* Avatar */}
-                        <div className="w-12 h-12 rounded-full overflow-hidden border border-white/[0.08] shrink-0">
-                          <Image
-                            src={getStudentAvatarUrl(student.id)}
-                            alt={student.name}
-                            width={48}
-                            height={48}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-
-                        {/* Info */}
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-on-surface text-sm truncate group-hover:text-primary-dim transition-colors">{student.name}</p>
-                          <p className="text-xs text-on-surface-variant/60 font-label truncate">{denomination?.abbreviation} · {church?.name.split(' ').slice(1).join(' ')}</p>
-                          <div className="mt-2 flex items-center gap-2">
-                            <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
-                              <div className={`h-full rounded-full bg-gradient-to-r ${progressGradient}`} style={{ width: `${rate}%` }} />
-                            </div>
-                            <span className={`text-xs font-bold font-label ${rateColor} shrink-0`}>{rate}%</span>
-                          </div>
-                        </div>
-                      </Link>
-                    )
-                  })}
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-on-surface text-sm truncate group-hover:text-primary-dim transition-colors">{student.name}</p>
+                        <p className="text-xs text-on-surface-variant/60 font-label truncate">{student.country ?? '—'}</p>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
               </section>
             )

@@ -1,8 +1,8 @@
-import type { Module } from '@/lib/types'
+import type { ApiModule } from '@/lib/api-types'
 import Link from 'next/link'
 import { BookOpen, Users } from '@phosphor-icons/react/dist/ssr'
 
-interface Props { course: Module; avgRate: number; teacherName?: string }
+interface Props { course: ApiModule; avgRate: number; teacherName?: string }
 
 export default function CourseCard({ course, avgRate, teacherName }: Props) {
   const rate = avgRate

@@ -1,10 +1,7 @@
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import PrincipalShell from '@/components/layout/PrincipalShell'
-import {
-  getStudentById, getCoursesForStudent, getAttendanceRate,
-  getClassById, getChurchById, getDenominationById, getStudentParticipationAvg, getStudentAvatarUrl
-} from '@/lib/mock-data'
+import { api } from '@/lib/api'
 import {
   Seal,
   CheckCircle,
@@ -20,20 +17,41 @@ const glassCard = {
   WebkitBackdropFilter: 'blur(16px)',
 }
 
-export default function StudentProfilePage({ params }: { params: { id: string } }) {
-  const student = getStudentById(params.id)
-  if (!student) notFound()
+function avatarFor(id: number, imageUrl: string | null, gender: string | null) {
+  if (imageUrl) return imageUrl
+  const g = gender === 'female' ? 'girl' : 'boy'
+  return `https://avatar.iran.liara.run/public/${g}?username=${id}`
+}
 
-  const modules = getCoursesForStudent(params.id)
-  const { present: totalPresent, total: totalSessions } = getAttendanceRate(params.id)
-  const totalAbsent = totalSessions - totalPresent
-  const overallRate = totalSessions > 0 ? Math.round((totalPresent / totalSessions) * 100) : 0
-  const participation = getStudentParticipationAvg(params.id)
+function participationLabel(avg: number | null): { label: string; avg: number } | null {
+  if (avg === null) return null
+  const pct = Math.round((avg / 4) * 100)
+  const label =
+    avg >= 3.5 ? 'Outstanding' :
+    avg >= 2.5 ? 'Strong' :
+    avg >= 1.5 ? 'Steady' :
+                 'Needs coaching'
+  return { label, avg: pct }
+}
 
-  const studentClass = getClassById(student.classId)
-  const church = getChurchById(student.churchId)
-  const denomination = church ? getDenominationById(church.denominationId) : undefined
+export default async function StudentProfilePage({ params }: { params: { id: string } }) {
+  const studentId = Number(params.id)
+  if (!Number.isFinite(studentId)) notFound()
+
+  let profile
+  try {
+    profile = await api.getStudentProfile(studentId)
+  } catch {
+    notFound()
+  }
+
+  const { student, attendance_rate: overallRate, present_count: totalPresent, absent_count: totalAbsent, module_breakdown, participation_average } = profile
+  const totalSessions = totalPresent + totalAbsent
+  const participation = participationLabel(participation_average)
   const isAwardEligible = overallRate >= 90
+
+  // Fetch the raw student for its image/gender fields so we can render the avatar.
+  const rawStudent = await api.getStudent(studentId)
 
   return (
     <PrincipalShell>
@@ -41,16 +59,16 @@ export default function StudentProfilePage({ params }: { params: { id: string } 
 
         {/* ── Desktop hero ── */}
         <section className="hidden md:grid grid-cols-12 gap-8 items-end mb-8">
-          {/* Left: avatar + name */}
           <div className="col-span-8 flex flex-col md:flex-row items-center md:items-end gap-8">
             <div className="relative group">
               <div className="w-48 h-48 rounded-xl overflow-hidden border-2 border-white/[0.1]"
                 style={{ boxShadow: '0 12px 40px rgba(124,58,237,0.2)' }}>
                 <Image
-                  src={getStudentAvatarUrl(student.id)}
+                  src={avatarFor(student.id, rawStudent.image, rawStudent.gender)}
                   alt={student.name}
                   width={192}
                   height={192}
+                  unoptimized={!!rawStudent.image}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -65,7 +83,7 @@ export default function StudentProfilePage({ params }: { params: { id: string } 
               <span className="text-primary-dim font-semibold tracking-wider text-xs uppercase font-label">Student Profile</span>
               <h1 className="text-4xl lg:text-5xl font-black font-headline tracking-tighter text-on-surface">{student.name}</h1>
               <div className="flex items-center justify-center md:justify-start gap-2 flex-wrap">
-                {[`ID: ${student.id.toUpperCase()}`, `${studentClass?.name} Class`, church?.name].filter(Boolean).map((label, i) => (
+                {[`${student.class}`, rawStudent.country].filter(Boolean).map((label, i) => (
                   <span key={i} className="text-on-surface-variant/60 text-xs font-label px-3 py-1 rounded-full border border-white/[0.07]"
                     style={{ background: 'rgba(255,255,255,0.04)' }}>{label}</span>
                 ))}
@@ -129,31 +147,32 @@ export default function StudentProfilePage({ params }: { params: { id: string } 
               <span
                 className="text-xs text-on-surface-variant/60 px-2 py-1 rounded font-label border border-white/[0.07]"
                 style={{ background: 'rgba(255,255,255,0.04)' }}
-              >{studentClass?.name} Class</span>
+              >{student.class}</span>
             </div>
             <div className="rounded-xl overflow-hidden border border-white/[0.07]" style={glassCard}>
               <div className="divide-y divide-white/[0.04]">
-                {modules.map((mod, idx) => {
-                  const { rate, present: modPresent, total: modTotal } = getAttendanceRate(params.id)
+                {module_breakdown.length === 0 && (
+                  <p className="p-6 text-sm text-on-surface-variant/60 font-label">No module data yet.</p>
+                )}
+                {module_breakdown.map((mod, idx) => {
+                  const rate = mod.rate
                   const iconColors = ['text-primary-dim bg-primary/10', 'text-secondary-dim bg-secondary/10', 'text-tertiary-dim bg-tertiary/10', 'text-on-surface-variant/60 bg-white/5']
                   const iconColor = iconColors[idx % iconColors.length]
                   const barGradient = rate >= 80 ? 'from-secondary to-secondary-dim' : rate >= 65 ? 'from-primary to-primary-dim' : 'from-tertiary to-tertiary-dim'
                   const rateColor = rate >= 80 ? 'text-secondary-dim' : rate >= 65 ? 'text-on-surface' : 'text-tertiary-dim'
                   return (
-                    <div key={mod.id} className="p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 hover:bg-white/[0.02] transition-all">
+                    <div key={mod.module_id} className="p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 hover:bg-white/[0.02] transition-all">
                       <div className="flex gap-4 items-center">
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${iconColor}`}>
                           <GraduationCap size={20} />
                         </div>
                         <div>
-                          <h4 className="font-bold text-on-surface font-label">{mod.name}</h4>
-                          <p className="text-xs text-on-surface-variant/60 font-label">{mod.books.length} books · {mod.code}</p>
+                          <h4 className="font-bold text-on-surface font-label">{mod.module_name}</h4>
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-2 w-full sm:w-48">
                         <div className="flex justify-between w-full text-xs font-bold font-label">
                           <span className={rateColor}>{rate}%</span>
-                          <span className="text-on-surface-variant/60">{modPresent}/{modTotal} sessions</span>
                         </div>
                         <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
                           <div className={`h-full rounded-full bg-gradient-to-r ${barGradient}`} style={{ width: `${rate}%` }} />
@@ -198,10 +217,11 @@ export default function StudentProfilePage({ params }: { params: { id: string } 
             <div className="w-32 h-32 rounded-full p-0.5 bg-gradient-to-br from-primary to-secondary">
               <div className="w-full h-full rounded-full overflow-hidden border-4 border-background">
                 <Image
-                  src={getStudentAvatarUrl(student.id)}
+                  src={avatarFor(student.id, rawStudent.image, rawStudent.gender)}
                   alt={student.name}
                   width={128}
                   height={128}
+                  unoptimized={!!rawStudent.image}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -216,7 +236,7 @@ export default function StudentProfilePage({ params }: { params: { id: string } 
           </div>
           <div>
             <h2 className="text-2xl font-headline font-extrabold tracking-tight text-on-surface">{student.name}</h2>
-            <p className="text-on-surface-variant/60 font-label text-sm">{studentClass?.name} Class · {denomination?.abbreviation ?? ''}</p>
+            <p className="text-on-surface-variant/60 font-label text-sm">{student.class} · {rawStudent.country ?? ''}</p>
           </div>
         </section>
 
@@ -265,14 +285,17 @@ export default function StudentProfilePage({ params }: { params: { id: string } 
             Module Breakdown
           </h3>
           <div className="rounded-xl p-6 space-y-6 border border-white/[0.07]" style={glassCard}>
-            {modules.map(mod => {
-              const { rate } = getAttendanceRate(params.id)
+            {module_breakdown.length === 0 && (
+              <p className="text-sm text-on-surface-variant/60 font-label">No module data yet.</p>
+            )}
+            {module_breakdown.map(mod => {
+              const rate = mod.rate
               const rateColor = rate >= 80 ? 'text-secondary-dim' : rate >= 65 ? 'text-primary-dim' : 'text-tertiary-dim'
               const barGradient = rate >= 80 ? 'from-secondary to-secondary-dim' : rate >= 65 ? 'from-primary to-primary-dim' : 'from-tertiary to-tertiary-dim'
               return (
-                <div key={mod.id} className="space-y-2">
+                <div key={mod.module_id} className="space-y-2">
                   <div className="flex justify-between text-sm font-label font-medium">
-                    <span className="text-on-surface truncate max-w-[60%]">{mod.name}</span>
+                    <span className="text-on-surface truncate max-w-[60%]">{mod.module_name}</span>
                     <span className={rateColor}>{rate}%</span>
                   </div>
                   <div className="h-2 w-full rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>

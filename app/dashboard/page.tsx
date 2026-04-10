@@ -1,11 +1,6 @@
 import Image from "next/image";
 import PrincipalShell from "@/components/layout/PrincipalShell";
-import {
-  getInstitutionHealth,
-  getTeachers,
-  getTeacherAttendanceRate,
-  getStudents,
-} from "@/lib/mock-data";
+import { api } from "@/lib/api";
 
 function rateColor(rate: number) {
   if (rate >= 80) return { text: "text-secondary-dim", gradient: "from-secondary to-secondary-dim" };
@@ -13,11 +8,8 @@ function rateColor(rate: number) {
   return { text: "text-tertiary-dim", gradient: "from-tertiary to-tertiary-dim" };
 }
 
-export default function DashboardPage() {
-  const overallModuleRate = getInstitutionHealth();
-  const overallClassRate = "99";
-  const teachers = getTeachers();
-  const totalStudents = getStudents().length;
+export default async function DashboardPage() {
+  const dashboard = await api.getDashboard();
 
   return (
     <PrincipalShell>
@@ -46,7 +38,7 @@ export default function DashboardPage() {
             </p>
             <div className="flex items-baseline gap-1">
               <span className="text-6xl font-black font-headline text-on-surface">
-                {overallClassRate}
+                {dashboard.overall_class_attendance}
               </span>
               <span className="text-2xl font-bold text-on-surface-variant/60 font-headline">%</span>
             </div>
@@ -65,7 +57,7 @@ export default function DashboardPage() {
             </p>
             <div className="flex items-baseline gap-1">
               <span className="text-6xl font-black font-headline text-on-surface">
-                {overallModuleRate}
+                {dashboard.overall_module_attendance}
               </span>
               <span className="text-2xl font-bold text-on-surface-variant/60 font-headline">%</span>
             </div>
@@ -83,7 +75,7 @@ export default function DashboardPage() {
               Students Enrolled
             </p>
             <span className="text-5xl font-black font-headline text-secondary-dim">
-              {totalStudents}
+              {dashboard.students_enrolled}
             </span>
           </div>
 
@@ -98,7 +90,7 @@ export default function DashboardPage() {
               Teachers
             </p>
             <span className="text-5xl font-black font-headline text-tertiary-dim">
-              {teachers.length}
+              {dashboard.teacher_count}
             </span>
           </div>
         </div>
@@ -109,11 +101,8 @@ export default function DashboardPage() {
             Teachers Targets
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {teachers.map((teacher) => {
-              const rate = getTeacherAttendanceRate(teacher.id);
-              const { text, gradient } = rateColor(rate);
-              const label =
-                rate >= 80 ? "Excellent" : rate >= 65 ? "Good" : "Needs attention";
+            {dashboard.teacher_targets.map((teacher) => {
+              const { text, gradient } = rateColor(teacher.rate);
               return (
                 <div
                   key={teacher.id}
@@ -134,16 +123,16 @@ export default function DashboardPage() {
                       <p className="text-sm font-semibold text-on-surface truncate">
                         {teacher.name}
                       </p>
-                      <p className={`text-[10px] font-label ${text}`}>{label}</p>
+                      <p className={`text-[10px] font-label ${text}`}>{teacher.rating}</p>
                     </div>
                     <span className={`text-xl font-black font-headline ${text}`}>
-                      {rate}%
+                      {teacher.rate}%
                     </span>
                   </div>
                   <div className="h-1.5 w-full rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
                     <div
                       className={`h-full rounded-full bg-gradient-to-r ${gradient}`}
-                      style={{ width: `${rate}%` }}
+                      style={{ width: `${teacher.rate}%` }}
                     />
                   </div>
                 </div>

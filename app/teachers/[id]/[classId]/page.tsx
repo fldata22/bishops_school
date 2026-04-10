@@ -2,11 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import PrincipalShell from '@/components/layout/PrincipalShell'
-import {
-  getTeacherById, getClassById, getModuleById,
-  getSessionsByTeacher, getSessionsByClass,
-  getAttendanceForSession,
-} from '@/lib/mock-data'
+import { api } from '@/lib/api'
 import { CaretLeft, BookOpen, CheckCircle, XCircle } from '@phosphor-icons/react/dist/ssr'
 
 const glassCard = {
@@ -15,46 +11,110 @@ const glassCard = {
   WebkitBackdropFilter: 'blur(16px)',
 }
 
-export default function TeacherClassBreakdownPage({ params }: { params: { id: string; classId: string } }) {
-  const teacher = getTeacherById(params.id)
-  const cls = getClassById(params.classId)
-  if (!teacher || !cls) notFound()
+export default async function TeacherClassBreakdownPage({
+  params,
+}: {
+  params: { id: string; classId: string }
+}) {
+  const teacherId = Number(params.id)
+  const classId = Number(params.classId)
+  if (!Number.isFinite(teacherId) || !Number.isFinite(classId)) notFound()
 
-  const teacherClassSessions = getSessionsByTeacher(params.id)
-    .filter(s => s.classId === params.classId)
-    .sort((a, b) => b.date.localeCompare(a.date))
+  let teacher, schoolClass
+  try {
+    ;[teacher, schoolClass] = await Promise.all([
+      api.getTeacher(teacherId),
+      api.getClass(classId),
+    ])
+  } catch {
+    notFound()
+  }
 
-  const totalClassSessions = getSessionsByClass(params.classId).length
-  const teachingPct = totalClassSessions > 0
-    ? Math.round((teacherClassSessions.length / totalClassSessions) * 100)
-    : 0
+  // Sessions by this teacher for this class
+  const sessionsList = await api.listSessions({
+    teacher_id: teacherId,
+    class_id: classId,
+  })
+  const sortedList = [...sessionsList].sort((a, b) => b.date.localeCompare(a.date))
 
-  const taughtModuleIds = Array.from(new Set(teacherClassSessions.map(s => s.moduleId)))
+  // Fetch full details (book, attendance records) for each session in parallel.
+  const detailed = await Promise.all(sortedList.map(s => api.getSession(s.id)))
 
-  const moduleGroups = taughtModuleIds.map(moduleId => {
-    const mod = getModuleById(moduleId)!
-    const sessions = teacherClassSessions.filter(s => s.moduleId === moduleId)
-    const enriched = sessions.map(session => {
-      const att = getAttendanceForSession(session.id)
-      const present = att.filter(a => a.status === 'present').length
-      const total = att.length
-      const rate = total > 0 ? Math.round((present / total) * 100) : 0
-      const book = mod.books.find(b => b.id === session.bookId)
-      const chapterName = book?.chapters[session.chapterIndex] ?? `Chapter ${session.chapterIndex + 1}`
-      const topic = book ? `${book.name} › ${chapterName}` : `Unknown`
-      return { session, present, total, rate, topic }
-    })
-    const avgRate = enriched.length > 0
-      ? Math.round(enriched.reduce((s, e) => s + e.rate, 0) / enriched.length)
+  // Also fetch the class sessions count for "share" KPI.
+  const classSessionsAll = await api.listSessions({ class_id: classId })
+  const totalClassSessions = classSessionsAll.length
+  const teachingPct =
+    totalClassSessions > 0
+      ? Math.round((sortedList.length / totalClassSessions) * 100)
       : 0
-    return { mod, enriched, avgRate }
+
+  // Group by module
+  const moduleMap = new Map<
+    number,
+    {
+      module: { id: number; name: string; code: string }
+      entries: Array<{
+        sessionId: number
+        present: number
+        absent: number
+        total: number
+        rate: number
+        date: string
+        topic: string
+      }>
+    }
+  >()
+
+  for (const session of detailed) {
+    const mod = session.module
+    if (!mod) continue
+    if (!moduleMap.has(mod.id)) {
+      moduleMap.set(mod.id, {
+        module: { id: mod.id, name: mod.name, code: mod.code },
+        entries: [],
+      })
+    }
+    const records = session.attendance_records ?? []
+    const present = records.filter(r => r.status === 'present').length
+    const total = records.length
+    const rate = total > 0 ? Math.round((present / total) * 100) : 0
+    const chapterName =
+      session.book?.chapters?.[session.chapter_index] ??
+      `Chapter ${session.chapter_index + 1}`
+    const topic = session.book ? `${session.book.name} › ${chapterName}` : 'Unknown'
+    moduleMap.get(mod.id)!.entries.push({
+      sessionId: session.id,
+      present,
+      absent: total - present,
+      total,
+      rate,
+      date: session.date,
+      topic,
+    })
+  }
+
+  const moduleGroups = Array.from(moduleMap.values()).map(group => {
+    const avgRate =
+      group.entries.length > 0
+        ? Math.round(
+            group.entries.reduce((s, e) => s + e.rate, 0) / group.entries.length
+          )
+        : 0
+    return { ...group, avgRate }
   })
 
-  const allAtt = teacherClassSessions.flatMap(s => getAttendanceForSession(s.id))
-  const overallPresent = allAtt.filter(a => a.status === 'present').length
-  const overallTotal = allAtt.length
-  const overallRate = overallTotal > 0 ? Math.round((overallPresent / overallTotal) * 100) : 0
-  const rateColor = overallRate >= 80 ? 'text-secondary-dim' : overallRate >= 65 ? 'text-primary-dim' : 'text-tertiary-dim'
+  // Overall stats
+  const allRecords = detailed.flatMap(s => s.attendance_records ?? [])
+  const overallPresent = allRecords.filter(r => r.status === 'present').length
+  const overallTotal = allRecords.length
+  const overallRate =
+    overallTotal > 0 ? Math.round((overallPresent / overallTotal) * 100) : 0
+  const rateColor =
+    overallRate >= 80
+      ? 'text-secondary-dim'
+      : overallRate >= 65
+        ? 'text-primary-dim'
+        : 'text-tertiary-dim'
 
   return (
     <PrincipalShell>
@@ -81,7 +141,7 @@ export default function TeacherClassBreakdownPage({ params }: { params: { id: st
             />
           </div>
           <div>
-            <p className="text-xs font-label text-on-surface-variant/60 uppercase tracking-widest mb-0.5">{cls.name} Class</p>
+            <p className="text-xs font-label text-on-surface-variant/60 uppercase tracking-widest mb-0.5">{schoolClass.name}</p>
             <h1 className="text-2xl md:text-3xl font-extrabold font-headline tracking-tight text-on-surface">{teacher.name}</h1>
           </div>
         </div>
@@ -90,7 +150,7 @@ export default function TeacherClassBreakdownPage({ params }: { params: { id: st
         <div className="grid grid-cols-3 gap-3 mb-8">
           <div className="rounded-xl p-4 border border-white/[0.07]" style={glassCard}>
             <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60 font-label mb-1">Sessions Taught</p>
-            <p className="text-3xl font-black font-headline text-on-surface">{teacherClassSessions.length}</p>
+            <p className="text-3xl font-black font-headline text-on-surface">{sortedList.length}</p>
             <p className="text-[10px] text-on-surface-variant/60 font-label mt-0.5">of {totalClassSessions} total</p>
           </div>
           <div className="rounded-xl p-4 border border-white/[0.07]" style={glassCard}>
@@ -107,7 +167,10 @@ export default function TeacherClassBreakdownPage({ params }: { params: { id: st
 
         {/* Module breakdowns */}
         <div className="space-y-6">
-          {moduleGroups.map(({ mod, enriched, avgRate }) => {
+          {moduleGroups.length === 0 && (
+            <p className="text-sm text-on-surface-variant/60 font-label">No sessions recorded yet.</p>
+          )}
+          {moduleGroups.map(({ module: mod, entries, avgRate }) => {
             const modRateColor = avgRate >= 80 ? 'text-secondary-dim' : avgRate >= 65 ? 'text-primary-dim' : 'text-tertiary-dim'
             const barGradient = avgRate >= 80 ? 'from-secondary to-secondary-dim' : avgRate >= 65 ? 'from-primary to-primary-dim' : 'from-tertiary to-tertiary-dim'
             return (
@@ -125,10 +188,10 @@ export default function TeacherClassBreakdownPage({ params }: { params: { id: st
                     </div>
                     <div>
                       <p className="font-bold text-sm font-headline text-on-surface">{mod.name}</p>
-                      <p className="text-[10px] text-on-surface-variant/60 font-label">{mod.code} · {enriched.length} session{enriched.length !== 1 ? 's' : ''}</p>
+                      <p className="text-[10px] text-on-surface-variant/60 font-label">{mod.code} · {entries.length} session{entries.length !== 1 ? 's' : ''}</p>
                     </div>
                   </div>
-                  {enriched.length > 0 && (
+                  {entries.length > 0 && (
                     <div className="text-right">
                       <p className={`text-lg font-black font-headline ${modRateColor}`}>{avgRate}%</p>
                       <p className="text-[10px] text-on-surface-variant/60 font-label">avg attendance</p>
@@ -137,42 +200,38 @@ export default function TeacherClassBreakdownPage({ params }: { params: { id: st
                 </div>
 
                 {/* Session rows */}
-                {enriched.length === 0 ? (
-                  <p className="px-5 py-4 text-xs font-label text-on-surface-variant/60">No sessions recorded yet.</p>
-                ) : (
-                  <div className="divide-y divide-white/[0.04]">
-                    {enriched.map(({ session, present, total, rate, topic }) => {
-                      const sRateColor = rate >= 80 ? 'text-secondary-dim' : rate >= 65 ? 'text-primary-dim' : 'text-tertiary-dim'
-                      const sBarGradient = rate >= 80 ? 'from-secondary to-secondary-dim' : rate >= 65 ? 'from-primary to-primary-dim' : 'from-tertiary to-tertiary-dim'
-                      const date = new Date(session.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-                      return (
-                        <div key={session.id} className="px-5 py-4 flex items-center gap-4">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-label font-medium text-on-surface truncate">{topic}</p>
-                            <p className="text-[10px] text-on-surface-variant/60 font-label mt-0.5">{date}</p>
-                            <div className="mt-2 h-1 w-full rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
-                              <div className={`h-full rounded-full bg-gradient-to-r ${sBarGradient}`} style={{ width: `${rate}%` }} />
-                            </div>
-                          </div>
-                          <div className="shrink-0 text-right">
-                            <p className={`text-base font-black font-headline ${sRateColor}`}>{rate}%</p>
-                            <div className="flex items-center justify-end gap-2 mt-0.5">
-                              <span className="flex items-center gap-0.5 text-[10px] text-secondary-dim font-label">
-                                <CheckCircle size={10} weight="fill" /> {present}
-                              </span>
-                              <span className="flex items-center gap-0.5 text-[10px] text-tertiary-dim font-label">
-                                <XCircle size={10} weight="fill" /> {total - present}
-                              </span>
-                            </div>
+                <div className="divide-y divide-white/[0.04]">
+                  {entries.map(({ sessionId, present, absent, rate, date, topic }) => {
+                    const sRateColor = rate >= 80 ? 'text-secondary-dim' : rate >= 65 ? 'text-primary-dim' : 'text-tertiary-dim'
+                    const sBarGradient = rate >= 80 ? 'from-secondary to-secondary-dim' : rate >= 65 ? 'from-primary to-primary-dim' : 'from-tertiary to-tertiary-dim'
+                    const displayDate = new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                    return (
+                      <div key={sessionId} className="px-5 py-4 flex items-center gap-4">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-label font-medium text-on-surface truncate">{topic}</p>
+                          <p className="text-[10px] text-on-surface-variant/60 font-label mt-0.5">{displayDate}</p>
+                          <div className="mt-2 h-1 w-full rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
+                            <div className={`h-full rounded-full bg-gradient-to-r ${sBarGradient}`} style={{ width: `${rate}%` }} />
                           </div>
                         </div>
-                      )
-                    })}
-                  </div>
-                )}
+                        <div className="shrink-0 text-right">
+                          <p className={`text-base font-black font-headline ${sRateColor}`}>{rate}%</p>
+                          <div className="flex items-center justify-end gap-2 mt-0.5">
+                            <span className="flex items-center gap-0.5 text-[10px] text-secondary-dim font-label">
+                              <CheckCircle size={10} weight="fill" /> {present}
+                            </span>
+                            <span className="flex items-center gap-0.5 text-[10px] text-tertiary-dim font-label">
+                              <XCircle size={10} weight="fill" /> {absent}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
 
                 {/* Module progress bar */}
-                {enriched.length > 0 && (
+                {entries.length > 0 && (
                   <div className="px-5 py-3 border-t border-white/[0.04]">
                     <div className="h-1 w-full rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
                       <div className={`h-full rounded-full bg-gradient-to-r ${barGradient}`} style={{ width: `${avgRate}%` }} />

@@ -9,6 +9,7 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'i.pravatar.cc' },
       { protocol: 'https', hostname: 'avatar.iran.liara.run' },
+      { protocol: 'https', hostname: 'bishops-school-api-3vlr1ol7.on-forge.com' },
     ],
   },
 }

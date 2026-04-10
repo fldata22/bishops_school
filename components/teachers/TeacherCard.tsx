@@ -1,11 +1,15 @@
 'use client'
 import Image from 'next/image'
 import Link from 'next/link'
-import type { Teacher, Class } from '@/lib/types'
+
+interface ClassChip {
+  id: number
+  name: string
+}
 
 interface Props {
-  teacher: Teacher
-  classes: Class[]
+  teacher: { id: number; name: string }
+  classes: ClassChip[]
   sessions: number
   sessionsThisMonth: number
   attendanceRate: number

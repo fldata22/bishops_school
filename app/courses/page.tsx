@@ -1,10 +1,18 @@
 import PrincipalShell from '@/components/layout/PrincipalShell'
-import { getModules, getModuleCompletionRate } from '@/lib/mock-data'
+import { api } from '@/lib/api'
 import CourseDirectoryClient from './CourseDirectoryClient'
 
-export default function CoursesPage() {
-  const modules = getModules()
-  const rates = Object.fromEntries(modules.map(m => [m.id, getModuleCompletionRate(m.id)]))
+export default async function CoursesPage() {
+  const modules = await api.listModules()
+
+  // Fetch progress in parallel for each module to build the rate lookup.
+  const progressResults = await Promise.all(
+    modules.map(m =>
+      api.getModuleProgress(m.id).then(p => [m.id, p.completion_rate] as const)
+    )
+  )
+  const rates: Record<number, number> = Object.fromEntries(progressResults)
+
   const avgCompletion = modules.length > 0
     ? Math.round(Object.values(rates).reduce((a, b) => a + b, 0) / modules.length)
     : 0
@@ -36,7 +44,7 @@ export default function CoursesPage() {
               <span className="text-on-surface-variant/60 text-xs block mb-1 font-label">Avg. Completion</span>
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-bold font-headline">{avgCompletion}%</span>
-                <span className="text-tertiary-dim text-xs font-semibold font-label">books taught</span>
+                <span className="text-tertiary-dim text-xs font-semibold font-label">chapters taught</span>
               </div>
             </div>
           </div>

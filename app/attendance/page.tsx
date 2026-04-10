@@ -1,15 +1,7 @@
 import Image from 'next/image'
 import PrincipalShell from '@/components/layout/PrincipalShell'
 import Link from 'next/link'
-import {
-  getInstitutionHealth, getCriticalAlerts,
-  getClasses, getClassAttendanceRate, getStudentsByClass,
-  getSessionsThisMonth,
-  getPresentTodayCount, getAbsentTodayCount, getStudents, getAttendanceRate,
-  getTeachers, getSessionsByTeacher, getTeacherAttendanceRate, getTotalSessionsCount,
-  getStudentAvatarUrl,
-  getModules, getModuleAttendanceRate, getSessionsByModule,
-} from '@/lib/mock-data'
+import { api } from '@/lib/api'
 import ProgressNebula from '@/components/ui/ProgressNebula'
 import { TrendUp, WarningCircle, EnvelopeSimple, Plus } from '@phosphor-icons/react/dist/ssr'
 
@@ -46,31 +38,22 @@ const glassRow = {
   WebkitBackdropFilter: 'blur(12px)',
 }
 
-export default function AttendancePage() {
-  const health = getInstitutionHealth()
-  const alerts = getCriticalAlerts()
-  const classes = getClasses()
-  const presentToday = getPresentTodayCount()
-  const absentToday = getAbsentTodayCount()
-  const totalStudents = getStudents().length
-  const totalSessions = getTotalSessionsCount()
+function avatarFor(id: number) {
+  return `https://i.pravatar.cc/80?u=${id}`
+}
 
-  const enrichedAlerts = alerts.map(a => {
-    const { present, total } = getAttendanceRate(a.studentId)
-    return { ...a, absent: total - present, total }
-  })
+export default async function AttendancePage() {
+  const overview = await api.getAttendanceOverview()
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
 
-  const activeModules = getModules()
-    .map(m => ({ module: m, rate: getModuleAttendanceRate(m.id), sessions: getSessionsByModule(m.id).length }))
-    .filter(x => x.sessions > 0)
+  const activeModules = overview.module_attendance.filter(m => m.sessions > 0)
 
   const kpis = [
-    { label: 'Total Students', value: totalStudents, secondary: null, glowBg: 'rgba(124,58,237,0.08)', bar: 'from-primary to-primary-dim', barWidth: '100%' },
-    { label: 'Present Today', value: presentToday, secondary: `${health}%`, glowBg: 'rgba(6,182,212,0.08)', bar: 'from-secondary to-secondary-dim', barWidth: `${health}%` },
-    { label: 'Absent', value: absentToday, secondary: null, glowBg: 'rgba(244,63,94,0.06)', bar: 'from-tertiary to-tertiary-dim', barWidth: `${Math.round((absentToday / Math.max(totalStudents, 1)) * 100)}%` },
-    { label: 'Teachers', value: getTeachers().length, secondary: null, glowBg: 'rgba(244,63,94,0.06)', bar: 'from-tertiary/70 to-tertiary-dim', barWidth: '100%' },
+    { label: 'Total Students', value: overview.total_students, secondary: null, glowBg: 'rgba(124,58,237,0.08)', bar: 'from-primary to-primary-dim', barWidth: '100%' },
+    { label: 'Present Today', value: overview.present_today, secondary: `${overview.overall_rate}%`, glowBg: 'rgba(6,182,212,0.08)', bar: 'from-secondary to-secondary-dim', barWidth: `${overview.overall_rate}%` },
+    { label: 'Absent', value: overview.absent_today, secondary: null, glowBg: 'rgba(244,63,94,0.06)', bar: 'from-tertiary to-tertiary-dim', barWidth: `${Math.round((overview.absent_today / Math.max(overview.total_students, 1)) * 100)}%` },
+    { label: 'Teachers', value: overview.teacher_count, secondary: null, glowBg: 'rgba(244,63,94,0.06)', bar: 'from-tertiary/70 to-tertiary-dim', barWidth: '100%' },
   ]
 
   return (
@@ -100,12 +83,12 @@ export default function AttendancePage() {
           <div className="relative z-10 flex flex-col items-center">
             <span className="font-label text-on-surface-variant/60 uppercase tracking-[0.2em] text-[10px] mb-2 font-semibold">Overall Attendance</span>
             <div className="flex items-baseline gap-1">
-              <span className="text-7xl font-extrabold tracking-tighter text-primary-dim font-headline">{health}</span>
+              <span className="text-7xl font-extrabold tracking-tighter text-primary-dim font-headline">{overview.overall_rate}</span>
               <span className="text-3xl font-bold text-primary/60 font-headline">%</span>
             </div>
             <div className="mt-6 flex items-center gap-2 px-4 py-1.5 bg-secondary/10 rounded-full border border-secondary/20">
               <TrendUp size={14} className="text-secondary-dim" />
-              <span className="text-secondary-dim font-medium text-xs font-label">+2.4% from last month</span>
+              <span className="text-secondary-dim font-medium text-xs font-label">Live snapshot</span>
             </div>
           </div>
         </section>
@@ -134,19 +117,19 @@ export default function AttendancePage() {
               <WarningCircle size={20} className="text-tertiary-dim" weight="fill" />
               Critical Alerts
             </h2>
-            <span className="text-xs font-medium text-tertiary-dim bg-tertiary/10 px-2.5 py-1 rounded-md font-label border border-tertiary/20">{alerts.length} Actions Needed</span>
+            <span className="text-xs font-medium text-tertiary-dim bg-tertiary/10 px-2.5 py-1 rounded-md font-label border border-tertiary/20">{overview.critical_alerts.length} Actions Needed</span>
           </div>
           <div className="space-y-3">
-            {enrichedAlerts.map(a => (
-              <Link key={`mob-${a.studentId}-${a.classId}`} href={`/students/${a.studentId}`}
+            {overview.critical_alerts.map(a => (
+              <Link key={`mob-${a.student_id}`} href={`/students/${a.student_id}`}
                 className="p-4 rounded-2xl flex items-center gap-4 border-l-4 border-tertiary transition-colors border border-tertiary/20"
                 style={{ background: 'rgba(244,63,94,0.06)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
                 <div className="w-12 h-12 rounded-xl overflow-hidden ring-2 ring-tertiary/20 shrink-0">
-                  <Image src={getStudentAvatarUrl(a.studentId)} alt={a.studentName} width={48} height={48} className="w-full h-full object-cover" />
+                  <Image src={avatarFor(a.student_id)} alt={a.student_name} width={48} height={48} className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-grow min-w-0">
-                  <h4 className="font-semibold text-sm text-on-surface">{a.studentName}</h4>
-                  <p className="text-xs text-on-surface-variant/60 font-label">{a.consecutiveAbsences} consecutive absences · {a.className}</p>
+                  <h4 className="font-semibold text-sm text-on-surface">{a.student_name}</h4>
+                  <p className="text-xs text-on-surface-variant/60 font-label">{a.consecutive_absences} consecutive absences · {a.class_name}</p>
                 </div>
                 <div className="w-8 h-8 flex items-center justify-center rounded-full bg-tertiary/10 text-tertiary-dim shrink-0">
                   <EnvelopeSimple size={16} />
@@ -160,36 +143,31 @@ export default function AttendancePage() {
         <section className="md:hidden space-y-4">
           <h2 className="text-lg font-bold font-headline text-on-surface">Class Attendance</h2>
           <div className="space-y-4">
-            {classes.map(cls => {
-              const avgRate = getClassAttendanceRate(cls.id)
-              const students = getStudentsByClass(cls.id)
-              const presentCount = Math.round((avgRate / 100) * students.length)
-              const { bar } = presenceBadgeClass(avgRate)
-              const statusLabel = avgRate >= 80 ? 'High Stability' : avgRate >= 65 ? 'Attention Required' : 'Critical'
-              const statusColor = avgRate >= 80 ? 'text-secondary-dim' : avgRate >= 65 ? 'text-on-surface' : 'text-tertiary-dim'
-              const sessionsMonth = getSessionsThisMonth(cls.id)
+            {overview.class_attendance.map(cls => {
+              const { bar } = presenceBadgeClass(cls.rate)
+              const statusLabel = cls.rate >= 80 ? 'High Stability' : cls.rate >= 65 ? 'Attention Required' : 'Critical'
+              const statusColor = cls.rate >= 80 ? 'text-secondary-dim' : cls.rate >= 65 ? 'text-on-surface' : 'text-tertiary-dim'
               return (
-                <div key={`mob-${cls.id}`}
+                <div key={`mob-${cls.class_id}`}
                   className="block p-5 rounded-3xl border border-white/[0.07] relative overflow-hidden group"
                   style={glassCard}>
                   <div className="absolute top-0 right-0 w-32 h-32 rounded-full -mr-16 -mt-16 blur-3xl" style={{ background: 'rgba(124,58,237,0.06)' }} />
                   <div className="flex justify-between items-start relative z-10">
                     <div className="space-y-1">
-                      <span className="text-[10px] font-bold uppercase tracking-wider font-label text-primary-dim">{cls.id.toUpperCase()}</span>
-                      <h3 className="text-base font-bold text-on-surface font-headline">{cls.name} Class</h3>
-                      <p className="text-xs text-on-surface-variant/60 font-label">{sessionsMonth} sessions this month</p>
+                      <h3 className="text-base font-bold text-on-surface font-headline">{cls.class_name}</h3>
+                      <p className="text-xs text-on-surface-variant/60 font-label">{cls.sessions_this_month} sessions this month</p>
                     </div>
                     <div className="flex flex-col items-end">
-                      <span className={`text-xl font-bold font-headline ${statusColor}`}>{avgRate}%</span>
+                      <span className={`text-xl font-bold font-headline ${statusColor}`}>{cls.rate}%</span>
                       <span className="text-[10px] text-on-surface-variant/60 font-label">{statusLabel}</span>
                     </div>
                   </div>
                   <div className="mt-6 space-y-2 relative z-10">
                     <div className="h-1.5 w-full rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
-                      <div className={`h-full rounded-full ${bar}`} style={{ width: `${avgRate}%` }} />
+                      <div className={`h-full rounded-full ${bar}`} style={{ width: `${cls.rate}%` }} />
                     </div>
                     <div className="flex justify-between text-[10px] font-medium text-on-surface-variant/60 font-label">
-                      <span>{presentCount}/{students.length} Students Present</span>
+                      <span>{cls.present}/{cls.total} Students Present</span>
                     </div>
                   </div>
                 </div>
@@ -202,28 +180,28 @@ export default function AttendancePage() {
         <section className="md:hidden space-y-4">
           <h2 className="text-lg font-bold font-headline text-on-surface">Module Attendance</h2>
           <div className="space-y-4">
-            {activeModules.map(({ module, rate, sessions }) => {
-              const { bar } = presenceBadgeClass(rate)
-              const statusColor = rate >= 80 ? 'text-secondary-dim' : rate >= 65 ? 'text-on-surface' : 'text-tertiary-dim'
+            {activeModules.map(mod => {
+              const { bar } = presenceBadgeClass(mod.rate)
+              const statusColor = mod.rate >= 80 ? 'text-secondary-dim' : mod.rate >= 65 ? 'text-on-surface' : 'text-tertiary-dim'
               return (
-                <div key={`mob-mod-${module.id}`}
+                <div key={`mob-mod-${mod.module_id}`}
                   className="block p-5 rounded-3xl border border-white/[0.07] relative overflow-hidden"
                   style={glassCard}>
                   <div className="absolute top-0 right-0 w-32 h-32 rounded-full -mr-16 -mt-16 blur-3xl" style={{ background: 'rgba(6,182,212,0.05)' }} />
                   <div className="flex justify-between items-start relative z-10">
                     <div className="space-y-1">
-                      <span className="text-[10px] font-bold uppercase tracking-wider font-label text-secondary-dim">{module.code}</span>
-                      <h3 className="text-base font-bold text-on-surface font-headline">{module.name}</h3>
-                      <p className="text-xs text-on-surface-variant/60 font-label">{sessions} sessions · {module.books.length} books</p>
+                      <span className="text-[10px] font-bold uppercase tracking-wider font-label text-secondary-dim">{mod.code}</span>
+                      <h3 className="text-base font-bold text-on-surface font-headline">{mod.module_name}</h3>
+                      <p className="text-xs text-on-surface-variant/60 font-label">{mod.sessions} sessions · {mod.topics} chapters</p>
                     </div>
                     <div className="flex flex-col items-end">
-                      <span className={`text-xl font-bold font-headline ${statusColor}`}>{rate}%</span>
+                      <span className={`text-xl font-bold font-headline ${statusColor}`}>{mod.rate}%</span>
                       <span className="text-[10px] text-on-surface-variant/60 font-label">Attendance</span>
                     </div>
                   </div>
                   <div className="mt-4 relative z-10">
                     <div className="h-1.5 w-full rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
-                      <div className={`h-full rounded-full ${bar}`} style={{ width: `${rate}%` }} />
+                      <div className={`h-full rounded-full ${bar}`} style={{ width: `${mod.rate}%` }} />
                     </div>
                   </div>
                 </div>
@@ -242,14 +220,11 @@ export default function AttendancePage() {
               <Link href="/courses" className="text-primary-dim text-sm font-label font-medium hover:underline">View Modules</Link>
             </div>
             <div className="space-y-4">
-              {classes.map(cls => {
-                const avgRate = getClassAttendanceRate(cls.id)
-                const { badge, bar, barWidth } = presenceBadgeClass(avgRate)
-                const students = getStudentsByClass(cls.id)
-                const sessionsMonth = getSessionsThisMonth(cls.id)
-                const timeLabel = `${students.length} students · ${sessionsMonth} sessions this month`
+              {overview.class_attendance.map(cls => {
+                const { badge, bar, barWidth } = presenceBadgeClass(cls.rate)
+                const timeLabel = `${cls.total} students · ${cls.sessions_this_month} sessions this month`
                 return (
-                  <div key={cls.id}
+                  <div key={cls.class_id}
                     className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-5 md:p-6 rounded-xl border border-white/[0.07]"
                     style={glassRow}>
                     <div className="flex items-center gap-5">
@@ -257,17 +232,17 @@ export default function AttendancePage() {
                         className="w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center border border-primary/20 shrink-0"
                         style={{ background: 'rgba(124,58,237,0.08)', boxShadow: '0 0 12px rgba(124,58,237,0.15)' }}
                       >
-                        <span className="text-lg font-black font-headline text-primary-dim">{cls.name[0]}</span>
+                        <span className="text-lg font-black font-headline text-primary-dim">{cls.class_name[0]}</span>
                       </div>
                       <div>
-                        <h4 className="font-bold text-base md:text-lg leading-tight text-on-surface">{cls.name} Class</h4>
+                        <h4 className="font-bold text-base md:text-lg leading-tight text-on-surface">{cls.class_name}</h4>
                         <p className="text-on-surface-variant/60 text-xs md:text-sm font-label mt-0.5">{timeLabel}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-6 md:gap-8 shrink-0">
                       <div className="text-right">
                         <p className="text-[10px] uppercase tracking-tight text-on-surface-variant/60 font-bold font-label mb-1.5">Status</p>
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold ring-1 ${badge}`}>{avgRate}% Presence</span>
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ring-1 ${badge}`}>{cls.rate}% Presence</span>
                       </div>
                       <div className="w-24 md:w-32">
                         <p className="text-[10px] uppercase tracking-tight text-on-surface-variant/60 font-bold font-label mb-1.5">Fill Rate</p>
@@ -288,10 +263,10 @@ export default function AttendancePage() {
                 <Link href="/courses" className="text-primary-dim text-sm font-label font-medium hover:underline">View All Modules</Link>
               </div>
               <div className="space-y-4">
-                {activeModules.map(({ module, rate, sessions }) => {
-                  const { badge, bar, barWidth } = presenceBadgeClass(rate)
+                {activeModules.map(mod => {
+                  const { badge, bar, barWidth } = presenceBadgeClass(mod.rate)
                   return (
-                    <div key={module.id}
+                    <div key={mod.module_id}
                       className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-5 md:p-6 rounded-xl border border-white/[0.07]"
                       style={glassRow}>
                       <div className="flex items-center gap-5">
@@ -299,17 +274,17 @@ export default function AttendancePage() {
                           className="w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center border border-secondary/20 shrink-0"
                           style={{ background: 'rgba(6,182,212,0.06)' }}
                         >
-                          <span className="text-xs font-black font-headline text-secondary-dim">{module.code}</span>
+                          <span className="text-xs font-black font-headline text-secondary-dim">{mod.code}</span>
                         </div>
                         <div>
-                          <h4 className="font-bold text-base leading-tight text-on-surface">{module.name}</h4>
-                          <p className="text-on-surface-variant/60 text-xs font-label mt-0.5">{sessions} sessions · {module.books.length} books</p>
+                          <h4 className="font-bold text-base leading-tight text-on-surface">{mod.module_name}</h4>
+                          <p className="text-on-surface-variant/60 text-xs font-label mt-0.5">{mod.sessions} sessions · {mod.topics} chapters</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-6 md:gap-8 shrink-0">
                         <div className="text-right">
                           <p className="text-[10px] uppercase tracking-tight text-on-surface-variant/60 font-bold font-label mb-1.5">Status</p>
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold ring-1 ${badge}`}>{rate}% Presence</span>
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold ring-1 ${badge}`}>{mod.rate}% Presence</span>
                         </div>
                         <div className="w-24 md:w-32">
                           <p className="text-[10px] uppercase tracking-tight text-on-surface-variant/60 font-bold font-label mb-1.5">Fill Rate</p>
@@ -328,25 +303,22 @@ export default function AttendancePage() {
             <div className="space-y-4 mt-8">
               <h3 className="text-lg font-bold font-headline text-on-surface">Teacher Activity</h3>
               <div className="space-y-3">
-                {getTeachers().map(teacher => {
-                  const teacherSessions = getSessionsByTeacher(teacher.id)
-                  const rate = getTeacherAttendanceRate(teacher.id)
-                  const pct = totalSessions > 0 ? Math.round((teacherSessions.length / totalSessions) * 100) : 0
-                  const barGradient = rate >= 80 ? 'from-secondary to-secondary-dim' : rate >= 65 ? 'from-primary to-primary-dim' : 'from-tertiary to-tertiary-dim'
+                {overview.teacher_activity.map(t => {
+                  const barGradient = 'from-primary to-primary-dim'
                   return (
-                    <div key={teacher.id} className="flex items-center gap-4 p-4 rounded-xl border border-white/[0.06]" style={glassCard}>
+                    <div key={t.teacher_id} className="flex items-center gap-4 p-4 rounded-xl border border-white/[0.06]" style={glassCard}>
                       <div className="w-9 h-9 rounded-full overflow-hidden border border-white/[0.08] shrink-0">
-                        <Image src={`https://i.pravatar.cc/80?u=${teacher.id}`} alt={teacher.name} width={36} height={36} className="w-full h-full object-cover" />
+                        <Image src={avatarFor(t.teacher_id)} alt={t.teacher_name} width={36} height={36} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-on-surface truncate">{teacher.name}</p>
+                        <p className="text-sm font-semibold text-on-surface truncate">{t.teacher_name}</p>
                         <div className="mt-1.5 h-1 w-full rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
-                          <div className={`h-full rounded-full bg-gradient-to-r ${barGradient}`} style={{ width: `${pct}%` }} />
+                          <div className={`h-full rounded-full bg-gradient-to-r ${barGradient}`} style={{ width: `${t.percentage_of_total}%` }} />
                         </div>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-xs font-bold font-label text-on-surface">{teacherSessions.length} sessions</p>
-                        <p className="text-[10px] text-on-surface-variant/60 font-label">{pct}% of total</p>
+                        <p className="text-xs font-bold font-label text-on-surface">{t.sessions} sessions</p>
+                        <p className="text-[10px] text-on-surface-variant/60 font-label">{t.percentage_of_total}% of total</p>
                       </div>
                     </div>
                   )
@@ -360,7 +332,7 @@ export default function AttendancePage() {
             {/* Critical Alerts */}
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-bold font-headline text-on-surface">Critical Alerts</h3>
-              <span className="bg-tertiary text-white text-[10px] font-black px-2 py-0.5 rounded font-label uppercase">{alerts.length} Active</span>
+              <span className="bg-tertiary text-white text-[10px] font-black px-2 py-0.5 rounded font-label uppercase">{overview.critical_alerts.length} Active</span>
             </div>
             <div
               className="rounded-2xl p-5 md:p-6 border-l-4 border-tertiary space-y-5 border border-tertiary/20"
@@ -368,20 +340,23 @@ export default function AttendancePage() {
             >
               <p className="text-sm text-on-surface-variant/60 font-label">Multiple consecutive absences detected. Recommended intervention required.</p>
               <div className="space-y-4">
-                {enrichedAlerts.map(a => (
-                  <Link key={`${a.studentId}-${a.classId}`} href={`/students/${a.studentId}`} className="flex items-center gap-4">
+                {overview.critical_alerts.map(a => (
+                  <Link key={`${a.student_id}`} href={`/students/${a.student_id}`} className="flex items-center gap-4">
                     <div className="w-11 h-11 rounded-xl overflow-hidden ring-2 ring-tertiary/20 shrink-0">
-                      <Image src={getStudentAvatarUrl(a.studentId)} alt={a.studentName} width={44} height={44} className="w-full h-full object-cover" />
+                      <Image src={avatarFor(a.student_id)} alt={a.student_name} width={44} height={44} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <p className="font-bold text-sm text-on-surface truncate">{a.studentName}</p>
-                        <span className="text-tertiary-dim font-black text-xs font-headline shrink-0">{a.absent}/{a.total} Missed</span>
+                        <p className="font-bold text-sm text-on-surface truncate">{a.student_name}</p>
+                        <span className="text-tertiary-dim font-black text-xs font-headline shrink-0">{a.consecutive_absences} missed</span>
                       </div>
-                      <p className="text-[11px] text-on-surface-variant/60 font-label">{a.className}</p>
+                      <p className="text-[11px] text-on-surface-variant/60 font-label">{a.class_name}</p>
                     </div>
                   </Link>
                 ))}
+                {overview.critical_alerts.length === 0 && (
+                  <p className="text-sm text-on-surface-variant/60 font-label">No alerts right now.</p>
+                )}
               </div>
               <button
                 className="w-full py-3 rounded-xl font-label font-bold text-[11px] uppercase tracking-widest border border-white/[0.08] text-on-surface-variant/60 hover:text-on-surface transition-colors"
@@ -400,9 +375,9 @@ export default function AttendancePage() {
               <h4 className="text-sm font-bold font-headline mb-6 text-on-surface">Institution Health</h4>
               <div className="flex items-center justify-center py-4">
                 <div className="relative w-32 h-32 flex items-center justify-center">
-                  <ProgressNebula value={health} size={128} strokeWidth={8} />
+                  <ProgressNebula value={overview.overall_rate} size={128} strokeWidth={8} />
                   <div className="absolute text-center">
-                    <span className="text-2xl font-black font-headline block text-on-surface">{health}%</span>
+                    <span className="text-2xl font-black font-headline block text-on-surface">{overview.overall_rate}%</span>
                     <span className="text-[9px] uppercase tracking-widest text-on-surface-variant/60 font-label">Retention</span>
                   </div>
                 </div>

@@ -1,14 +1,13 @@
 import PrincipalShell from '@/components/layout/PrincipalShell'
-import {
-  getTeachers, getClassesForTeacher, getSessionsByTeacher,
-  getTeacherAttendanceRate, getSessionsThisMonthByTeacher,
-  getTotalSessionsCount
-} from '@/lib/mock-data'
+import { api } from '@/lib/api'
 import TeacherCard from '@/components/teachers/TeacherCard'
 
-export default function TeachersPage() {
-  const teachers = getTeachers()
-  const totalSessions = getTotalSessionsCount()
+export default async function TeachersPage() {
+  const [teachers, classes, overview] = await Promise.all([
+    api.listTeachers(),
+    api.listClasses(),
+    api.getAttendanceOverview(),
+  ])
 
   return (
     <PrincipalShell>
@@ -25,19 +24,21 @@ export default function TeachersPage() {
         {/* Teacher cards grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {teachers.map(teacher => {
-            const classes = getClassesForTeacher(teacher.id)
-            const sessions = getSessionsByTeacher(teacher.id)
-            const sessionsThisMonth = getSessionsThisMonthByTeacher(teacher.id)
-            const attendanceRate = getTeacherAttendanceRate(teacher.id)
-            const sessionPct = totalSessions > 0 ? Math.round((sessions.length / totalSessions) * 100) : 0
+            const teacherClasses = classes
+              .filter(c => c.teacher_id === teacher.id)
+              .map(c => ({ id: c.id, name: c.name }))
+            const activity = overview.teacher_activity.find(a => a.teacher_id === teacher.id)
+            const sessionsCount = activity?.sessions ?? 0
+            const attendanceRate = 0 // will come from /teachers/{id}/stats when opened
+            const sessionPct = activity?.percentage_of_total ?? 0
 
             return (
               <TeacherCard
                 key={teacher.id}
                 teacher={teacher}
-                classes={classes}
-                sessions={sessions.length}
-                sessionsThisMonth={sessionsThisMonth}
+                classes={teacherClasses}
+                sessions={sessionsCount}
+                sessionsThisMonth={sessionsCount}
                 attendanceRate={attendanceRate}
                 sessionPct={sessionPct}
               />
