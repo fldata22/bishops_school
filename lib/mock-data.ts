@@ -385,6 +385,8 @@ const runtimeAttendance: Attendance[] = []
 const runtimeClasses: Class[] = []
 const runtimeDeletedClassIds = new Set<string>()
 const runtimeStudentPatches: Record<string, Partial<Student>> = {}
+const runtimeNewStudents: Student[] = []
+const runtimeDeletedStudentIds = new Set<string>()
 const runtimeTeachers: Teacher[] = []
 const runtimeDeletedTeacherIds = new Set<string>()
 const runtimeChurches: Church[] = []
@@ -439,7 +441,12 @@ export function getCourses(): Module[] { return MODULES }
 export function getCourseById(id: string): Module | undefined { return MODULES.find(m => m.id === id) }
 
 export function getStudents(): Student[] {
-  return STUDENTS.map(s => ({ ...s, ...runtimeStudentPatches[s.id] }))
+  const deletedIds = runtimeDeletedStudentIds
+  const base = STUDENTS
+    .filter(s => !deletedIds.has(s.id))
+    .map(s => runtimeStudentPatches[s.id] ? { ...s, ...runtimeStudentPatches[s.id] } : s)
+  const newOnes = runtimeNewStudents.filter(s => !deletedIds.has(s.id))
+  return [...base, ...newOnes]
 }
 export function getAllStudents(): Student[] { return getStudents() }
 export function getStudentById(id: string): Student | undefined {
@@ -790,6 +797,9 @@ export function deleteClass(id: string): void {
       runtimeStudentPatches[s.id] = { ...runtimeStudentPatches[s.id], classId: '' }
     }
   }
+  for (const s of runtimeNewStudents) {
+    if (s.classId === id) s.classId = ''
+  }
 }
 
 export function addTeacher(name: string): Teacher {
@@ -838,4 +848,28 @@ export function deleteChurch(id: string): void {
   const rtIdx = runtimeChurches.findIndex(c => c.id === id)
   if (rtIdx !== -1) { runtimeChurches.splice(rtIdx, 1); return }
   runtimeDeletedChurchIds.add(id)
+}
+
+export function addStudent(
+  name: string,
+  classId: string,
+  churchId: string,
+  gender: 'male' | 'female'
+): Student {
+  const s: Student = { id: `stu-${Date.now()}`, name, classId, churchId, gender }
+  runtimeNewStudents.push(s)
+  return s
+}
+
+export function updateStudent(id: string, patch: Partial<Omit<Student, 'id'>>): void {
+  if (runtimeDeletedStudentIds.has(id)) return
+  const inNew = runtimeNewStudents.find(s => s.id === id)
+  if (inNew) { Object.assign(inNew, patch); return }
+  runtimeStudentPatches[id] = { ...runtimeStudentPatches[id], ...patch }
+}
+
+export function deleteStudent(id: string): void {
+  const rtIdx = runtimeNewStudents.findIndex(s => s.id === id)
+  if (rtIdx !== -1) { runtimeNewStudents.splice(rtIdx, 1); return }
+  runtimeDeletedStudentIds.add(id)
 }
