@@ -36,7 +36,7 @@ export default function CoursesPage() {
               <span className="text-on-surface-variant/60 text-xs block mb-1 font-label">Avg. Completion</span>
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-bold font-headline">{avgCompletion}%</span>
-                <span className="text-tertiary-dim text-xs font-semibold font-label">topics taught</span>
+                <span className="text-tertiary-dim text-xs font-semibold font-label">books taught</span>
               </div>
             </div>
           </div>
