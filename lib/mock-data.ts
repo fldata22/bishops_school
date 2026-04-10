@@ -1,4 +1,4 @@
-import type { Principal, Denomination, Church, Class, Teacher, Module, TeacherModuleAssignment, Student, Session, Attendance, AttendanceRate, CriticalAlert, WeeklyTrend } from './types'
+import type { Principal, Denomination, Church, Class, Teacher, Module, Student, Session, Attendance, AttendanceRate, CriticalAlert, WeeklyTrend } from './types'
 
 // ─── Records ────────────────────────────────────────────────────────────────
 
@@ -21,8 +21,8 @@ export const CHURCHES: Church[] = [
 ]
 
 export const CLASSES: Class[] = [
-  { id: 'cls1', name: 'Makarios' },
-  { id: 'cls2', name: 'Poimen'   },
+  { id: 'cls1', name: 'Makarios', teacherId: 't1' },
+  { id: 'cls2', name: 'Poimen',   teacherId: 't2' },
 ]
 
 export const TEACHERS: Teacher[] = [
@@ -222,17 +222,6 @@ export const MODULES: Module[] = [
   },
 ]
 
-export const TEACHER_MODULE_ASSIGNMENTS: TeacherModuleAssignment[] = [
-  { id: 'ta1', teacherId: 't1', moduleId: 'm1', classId: 'cls1' },
-  { id: 'ta2', teacherId: 't2', moduleId: 'm1', classId: 'cls2' },
-  { id: 'ta3', teacherId: 't3', moduleId: 'm2', classId: 'cls1' },
-  { id: 'ta4', teacherId: 't4', moduleId: 'm2', classId: 'cls2' },
-  { id: 'ta5', teacherId: 't2', moduleId: 'm3', classId: 'cls1' },
-  { id: 'ta6', teacherId: 't1', moduleId: 'm3', classId: 'cls2' },
-  { id: 'ta7', teacherId: 't4', moduleId: 'm4', classId: 'cls1' },
-  { id: 'ta8', teacherId: 't3', moduleId: 'm4', classId: 'cls2' },
-]
-
 // ─── Date helpers ─────────────────────────────────────────────────────────────
 
 const today = new Date().toISOString().split('T')[0]
@@ -245,24 +234,24 @@ function daysAgo(n: number): string {
 // ─── Sessions ─────────────────────────────────────────────────────────────────
 
 export const SESSIONS: Session[] = [
-  // Makarios class (cls1) — topics progress in order per module per class
+  // Makarios class (cls1) — all sessions taught by t1
   { id: 'ses1',  classId: 'cls1', moduleId: 'm1', teacherId: 't1', date: daysAgo(28), topicIndex: 0 },
   { id: 'ses2',  classId: 'cls1', moduleId: 'm1', teacherId: 't1', date: daysAgo(21), topicIndex: 1 },
-  { id: 'ses3',  classId: 'cls1', moduleId: 'm2', teacherId: 't3', date: daysAgo(20), topicIndex: 0 },
-  { id: 'ses4',  classId: 'cls1', moduleId: 'm2', teacherId: 't3', date: daysAgo(14), topicIndex: 1 },
-  { id: 'ses5',  classId: 'cls1', moduleId: 'm3', teacherId: 't2', date: daysAgo(13), topicIndex: 0 },
+  { id: 'ses3',  classId: 'cls1', moduleId: 'm2', teacherId: 't1', date: daysAgo(20), topicIndex: 0 },
+  { id: 'ses4',  classId: 'cls1', moduleId: 'm2', teacherId: 't1', date: daysAgo(14), topicIndex: 1 },
+  { id: 'ses5',  classId: 'cls1', moduleId: 'm3', teacherId: 't1', date: daysAgo(13), topicIndex: 0 },
   { id: 'ses6',  classId: 'cls1', moduleId: 'm1', teacherId: 't1', date: daysAgo(7),  topicIndex: 2 },
-  { id: 'ses7',  classId: 'cls1', moduleId: 'm2', teacherId: 't3', date: daysAgo(3),  topicIndex: 2 },
-  { id: 'ses8',  classId: 'cls1', moduleId: 'm3', teacherId: 't2', date: today,        topicIndex: 1 },
-  // Poimen class (cls2)
+  { id: 'ses7',  classId: 'cls1', moduleId: 'm2', teacherId: 't1', date: daysAgo(3),  topicIndex: 2 },
+  { id: 'ses8',  classId: 'cls1', moduleId: 'm3', teacherId: 't1', date: today,        topicIndex: 1 },
+  // Poimen class (cls2) — all sessions taught by t2
   { id: 'ses9',  classId: 'cls2', moduleId: 'm1', teacherId: 't2', date: daysAgo(27), topicIndex: 0 },
-  { id: 'ses10', classId: 'cls2', moduleId: 'm2', teacherId: 't4', date: daysAgo(20), topicIndex: 0 },
+  { id: 'ses10', classId: 'cls2', moduleId: 'm2', teacherId: 't2', date: daysAgo(20), topicIndex: 0 },
   { id: 'ses11', classId: 'cls2', moduleId: 'm1', teacherId: 't2', date: daysAgo(18), topicIndex: 1 },
-  { id: 'ses12', classId: 'cls2', moduleId: 'm3', teacherId: 't1', date: daysAgo(13), topicIndex: 0 },
-  { id: 'ses13', classId: 'cls2', moduleId: 'm2', teacherId: 't4', date: daysAgo(11), topicIndex: 1 },
+  { id: 'ses12', classId: 'cls2', moduleId: 'm3', teacherId: 't2', date: daysAgo(13), topicIndex: 0 },
+  { id: 'ses13', classId: 'cls2', moduleId: 'm2', teacherId: 't2', date: daysAgo(11), topicIndex: 1 },
   { id: 'ses14', classId: 'cls2', moduleId: 'm1', teacherId: 't2', date: daysAgo(6),  topicIndex: 2 },
-  { id: 'ses15', classId: 'cls2', moduleId: 'm3', teacherId: 't1', date: daysAgo(2),  topicIndex: 1 },
-  { id: 'ses16', classId: 'cls2', moduleId: 'm4', teacherId: 't3', date: today,        topicIndex: 0 },
+  { id: 'ses15', classId: 'cls2', moduleId: 'm3', teacherId: 't2', date: daysAgo(2),  topicIndex: 1 },
+  { id: 'ses16', classId: 'cls2', moduleId: 'm4', teacherId: 't2', date: today,        topicIndex: 0 },
 ]
 
 // ─── Attendance ───────────────────────────────────────────────────────────────
@@ -362,12 +351,18 @@ export function getAttendanceForSession(sessionId: string): Attendance[] {
   return getAllAttendance().filter(a => a.sessionId === sessionId)
 }
 
-export function getTeacherModuleAssignments(): TeacherModuleAssignment[] { return TEACHER_MODULE_ASSIGNMENTS }
 export function getTeachersForModule(moduleId: string): { teacher: Teacher; classId: string }[] {
-  return TEACHER_MODULE_ASSIGNMENTS
-    .filter(a => a.moduleId === moduleId)
-    .map(a => ({ teacher: TEACHERS.find(t => t.id === a.teacherId)!, classId: a.classId }))
-    .filter(x => x.teacher)
+  const seen = new Set<string>()
+  const results: { teacher: Teacher; classId: string }[] = []
+  for (const session of getAllSessions()) {
+    if (session.moduleId !== moduleId) continue
+    const key = `${session.teacherId}-${session.classId}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    const teacher = getTeacherById(session.teacherId)
+    if (teacher) results.push({ teacher, classId: session.classId })
+  }
+  return results
 }
 
 // ─── Attendance rate functions ────────────────────────────────────────────────
@@ -502,21 +497,14 @@ export function getCriticalAlerts(): CriticalAlert[] {
 export function getCoursesForStudent(studentId: string): Module[] {
   const student = STUDENTS.find(s => s.id === studentId)
   if (!student) return []
-  const moduleIds = Array.from(new Set(
-    TEACHER_MODULE_ASSIGNMENTS
-      .filter(a => a.classId === student.classId)
-      .map(a => a.moduleId)
-  ))
-  return MODULES.filter(m => moduleIds.includes(m.id))
+  return MODULES
 }
 
 // ─── Students for module ──────────────────────────────────────────────────────
 
-export function getStudentsForModule(moduleId: string): Student[] {
-  const classIds = Array.from(new Set(
-    TEACHER_MODULE_ASSIGNMENTS.filter(a => a.moduleId === moduleId).map(a => a.classId)
-  ))
-  return STUDENTS.filter(s => classIds.includes(s.classId))
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function getStudentsForModule(_moduleId: string): Student[] {
+  return STUDENTS
 }
 
 // ─── Recent attendance history ────────────────────────────────────────────────
@@ -596,10 +584,7 @@ export function getTeacherAttendanceRate(teacherId: string): number {
 }
 
 export function getClassesForTeacher(teacherId: string): Class[] {
-  const classIds = Array.from(new Set(
-    TEACHER_MODULE_ASSIGNMENTS.filter(a => a.teacherId === teacherId).map(a => a.classId)
-  ))
-  return CLASSES.filter(c => classIds.includes(c.id))
+  return CLASSES.filter(c => c.teacherId === teacherId)
 }
 
 export function getSessionsThisMonthByTeacher(teacherId: string): number {

@@ -20,6 +20,7 @@ export interface Church {
 export interface Class {
   id: string
   name: string  // "Makarios" | "Poimen"
+  teacherId: string
 }
 
 export interface Teacher {
@@ -34,12 +35,6 @@ export interface Module {
   topics: string[]
 }
 
-export interface TeacherModuleAssignment {
-  id: string
-  teacherId: string
-  moduleId: string
-  classId: string
-}
 
 export interface Student {
   id: string
