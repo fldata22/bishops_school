@@ -4,7 +4,6 @@ import PrincipalShell from '@/components/layout/PrincipalShell'
 import { api } from '@/lib/api'
 import {
   CaretRight,
-  ArrowSquareOut,
   UserCheck,
   Users,
   BookOpen,
@@ -59,13 +58,6 @@ export default async function CourseDetailPage({ params }: { params: { id: strin
             </p>
           </div>
           <div className="hidden md:flex items-center gap-4">
-            <button
-              className="px-6 py-3 rounded-full border border-white/[0.08] hover:bg-white/5 transition-all text-on-surface font-semibold font-label flex items-center gap-2 text-sm"
-              style={glassCard}
-            >
-              <ArrowSquareOut size={18} />
-              Export
-            </button>
             <Link
               href="/attend"
               className="px-8 py-3 rounded-full font-bold font-label flex items-center gap-2 text-sm text-white hover:opacity-90 hover:scale-105 transition-all"
