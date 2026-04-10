@@ -28,11 +28,17 @@ export interface Teacher {
   name: string
 }
 
+export interface Book {
+  id: string
+  name: string
+  chapters: string[]
+}
+
 export interface Module {
   id: string
   name: string
   code: string
-  topics: string[]
+  books: Book[]
 }
 
 
@@ -50,7 +56,8 @@ export interface Session {
   moduleId: string
   teacherId: string
   date: string  // ISO date string 'YYYY-MM-DD'
-  topicIndex: number
+  bookId: string
+  chapterIndex: number
 }
 
 export interface Attendance {
