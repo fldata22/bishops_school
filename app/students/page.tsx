@@ -32,11 +32,6 @@ export default async function StudentsPage() {
           {classes.map(cls => {
             const classStudents = students.filter(s => s.class_id === cls.id)
             if (classStudents.length === 0) return null
-            const categoryLabel = cls.category === 'non_consecrated'
-              ? 'Non-Consecrated'
-              : cls.category === 'newly_consecrated'
-                ? 'Newly Consecrated'
-                : null
 
             return (
               <section key={cls.id}>
@@ -53,14 +48,6 @@ export default async function StudentsPage() {
                   >
                     {classStudents.length} students
                   </span>
-                  {categoryLabel && (
-                    <span
-                      className="text-xs font-label text-primary-dim px-2.5 py-1 rounded-full border border-primary/20"
-                      style={{ background: 'rgba(124,58,237,0.08)' }}
-                    >
-                      {categoryLabel}
-                    </span>
-                  )}
                 </div>
 
                 {/* Student grid */}
