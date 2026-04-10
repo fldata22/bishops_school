@@ -387,6 +387,8 @@ const runtimeDeletedClassIds = new Set<string>()
 const runtimeStudentPatches: Record<string, Partial<Student>> = {}
 const runtimeTeachers: Teacher[] = []
 const runtimeDeletedTeacherIds = new Set<string>()
+const runtimeChurches: Church[] = []
+const runtimeDeletedChurchIds = new Set<string>()
 
 // ─── Query Functions ──────────────────────────────────────────────────────────
 
@@ -397,9 +399,17 @@ export function getStudentAvatarUrl(studentId: string): string {
 }
 
 export function getDenominations(): Denomination[] { return DENOMINATIONS }
-export function getChurches(): Church[] { return CHURCHES }
-export function getChurchById(id: string): Church | undefined { return CHURCHES.find(c => c.id === id) }
-export function getChurchesByDenomination(denominationId: string): Church[] { return CHURCHES.filter(c => c.denominationId === denominationId) }
+export function getChurches(): Church[] {
+  const base = CHURCHES.filter(c => !runtimeDeletedChurchIds.has(c.id))
+  return [...base, ...runtimeChurches]
+}
+export function getChurchById(id: string): Church | undefined {
+  if (runtimeDeletedChurchIds.has(id)) return undefined
+  return runtimeChurches.find(c => c.id === id) ?? CHURCHES.find(c => c.id === id)
+}
+export function getChurchesByDenomination(denominationId: string): Church[] {
+  return getChurches().filter(c => c.denominationId === denominationId)
+}
 export function getDenominationById(id: string): Denomination | undefined { return DENOMINATIONS.find(d => d.id === id) }
 
 export function getClasses(): Class[] {
@@ -802,4 +812,30 @@ export function deleteTeacher(id: string): void {
   const rtIdx = runtimeTeachers.findIndex(t => t.id === id)
   if (rtIdx !== -1) { runtimeTeachers.splice(rtIdx, 1); return }
   runtimeDeletedTeacherIds.add(id)
+}
+
+export function addChurch(name: string, denominationId: string): Church {
+  const c: Church = { id: `ch-${Date.now()}`, name, denominationId }
+  runtimeChurches.push(c)
+  return c
+}
+
+export function updateChurch(id: string, patch: { name?: string; denominationId?: string }): void {
+  const inRuntime = runtimeChurches.find(c => c.id === id)
+  if (inRuntime) {
+    if (patch.name !== undefined) inRuntime.name = patch.name
+    if (patch.denominationId !== undefined) inRuntime.denominationId = patch.denominationId
+    return
+  }
+  const inBase = CHURCHES.find(c => c.id === id)
+  if (inBase) {
+    if (patch.name !== undefined) inBase.name = patch.name
+    if (patch.denominationId !== undefined) inBase.denominationId = patch.denominationId
+  }
+}
+
+export function deleteChurch(id: string): void {
+  const rtIdx = runtimeChurches.findIndex(c => c.id === id)
+  if (rtIdx !== -1) { runtimeChurches.splice(rtIdx, 1); return }
+  runtimeDeletedChurchIds.add(id)
 }
