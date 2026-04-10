@@ -1,4 +1,4 @@
-import type { Principal, Denomination, Church, Class, Teacher, Module, Student, Session, Attendance, AttendanceRate, CriticalAlert, WeeklyTrend } from './types'
+import type { Principal, Denomination, Church, Class, Teacher, Module, Book, Student, Session, Attendance, AttendanceRate, CriticalAlert, WeeklyTrend } from './types'
 
 // ─── Records ────────────────────────────────────────────────────────────────
 
@@ -75,150 +75,228 @@ export const STUDENTS: Student[] = [
 export const MODULES: Module[] = [
   {
     id: 'm1', name: 'Loyalty', code: 'L',
-    topics: [
-      'Loyalty And Disloyalty','Those Who Accuse You','Those Who Are Proud',
-      'Those Who Are Dangerous Sons','Those Who Are Ignorant','Those Who Forget',
-      'Those Who Leave You','Those Who Pretend','One of You Is a Devil',
-      'Those Who Honour You','Those Who Are Offended','Judas Who Is He?',
-      'Those Who Are Mad','Why Loyalty','Pillars Of Loyalty',
-      'Those Who Are Wolves','Those Who Are Slanderers','Those Who Rebel',
-      'Those Who Make Shipwreck','Be Faithful unto Death',
+    books: [
+      { id: 'm1-b1',  name: 'Loyalty And Disloyalty',          chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm1-b2',  name: 'Those Who Accuse You',             chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm1-b3',  name: 'Those Who Are Proud',              chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm1-b4',  name: 'Those Who Are Dangerous Sons',     chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm1-b5',  name: 'Those Who Are Ignorant',           chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm1-b6',  name: 'Those Who Forget',                 chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm1-b7',  name: 'Those Who Leave You',              chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm1-b8',  name: 'Those Who Pretend',                chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm1-b9',  name: 'One of You Is a Devil',            chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm1-b10', name: 'Those Who Honour You',             chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm1-b11', name: 'Those Who Are Offended',           chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm1-b12', name: 'Judas Who Is He?',                 chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm1-b13', name: 'Those Who Are Mad',                chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm1-b14', name: 'Why Loyalty',                      chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm1-b15', name: 'Pillars Of Loyalty',               chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm1-b16', name: 'Those Who Are Wolves',             chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm1-b17', name: 'Those Who Are Slanderers',         chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm1-b18', name: 'Those Who Rebel',                  chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm1-b19', name: 'Those Who Make Shipwreck',         chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm1-b20', name: 'Be Faithful unto Death',           chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
     ],
   },
   {
     id: 'm2', name: 'The Call of God', code: 'COG',
-    topics: [
-      'Many Are Called','Why Few Are Chosen','Attempt Great Things for God',
-      'Tasters Or Partakers','Can\'t You Do Just a Little Bit More',
-      'Weeping and Gnashing','Ready @20','Am I Good for Nothing',
-      'Fruitfulness','Preparation of the Gospel','The Privilege',
-      'Going Deeper and Doing More','Ministerial Barrenness',
-      'Predestination','Awake O Sleeper','The Word of My Patience',
+    books: [
+      { id: 'm2-b1',  name: 'Many Are Called',                           chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm2-b2',  name: 'Why Few Are Chosen',                        chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm2-b3',  name: 'Attempt Great Things for God',              chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm2-b4',  name: 'Tasters Or Partakers',                      chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm2-b5',  name: "Can't You Do Just a Little Bit More",       chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm2-b6',  name: 'Weeping and Gnashing',                      chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm2-b7',  name: 'Ready @20',                                 chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm2-b8',  name: 'Am I Good for Nothing',                     chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm2-b9',  name: 'Fruitfulness',                              chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm2-b10', name: 'Preparation of the Gospel',                 chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm2-b11', name: 'The Privilege',                             chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm2-b12', name: 'Going Deeper and Doing More',               chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm2-b13', name: 'Ministerial Barrenness',                    chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm2-b14', name: 'Predestination',                            chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm2-b15', name: 'Awake O Sleeper',                           chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm2-b16', name: 'The Word of My Patience',                   chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
     ],
   },
   {
     id: 'm3', name: 'The Work of Ministry', code: 'WOM',
-    topics: [
-      'How You Can Make Full Proof of Your Ministry',
-      'Rules of Full Time Ministry','Rules of Church Work',
-      'Losing Suffering Sacrificing and Dying',
-      'It Is a Great Thing to Serve the Lord',
-      'The Tree and Your Ministry','Not a Novice','Seeing And Hearing',
-      'If You Love the Lord','Bema Judgment and Justice','Stir It Up',
-      'Ministerial Ethics','The Big Secret ...Your Ministry Depends on Books',
-      'The Tests of the Righteous','The Reward for Hard Work is more work',
+    books: [
+      { id: 'm3-b1',  name: 'How You Can Make Full Proof of Your Ministry', chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm3-b2',  name: 'Rules of Full Time Ministry',                  chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm3-b3',  name: 'Rules of Church Work',                         chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm3-b4',  name: 'Losing Suffering Sacrificing and Dying',       chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm3-b5',  name: 'It Is a Great Thing to Serve the Lord',        chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm3-b6',  name: 'The Tree and Your Ministry',                   chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm3-b7',  name: 'Not a Novice',                                 chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm3-b8',  name: 'Seeing And Hearing',                           chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm3-b9',  name: 'If You Love the Lord',                         chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm3-b10', name: 'Bema Judgment and Justice',                    chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm3-b11', name: 'Stir It Up',                                   chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm3-b12', name: 'Ministerial Ethics',                           chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm3-b13', name: 'The Big Secret ...Your Ministry Depends on Books', chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm3-b14', name: 'The Tests of the Righteous',                   chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
     ],
   },
   {
     id: 'm4', name: 'Church Growth', code: 'CG',
-    topics: [
-      'Church Growth','Mega Church','Church Planting',
-      'Double Mega Missionary Church','1000 Micro Churches',
-      'The Church Must Send','Why Is This Church Not Working?',
-      'The Gift Of Governments','Church Administration',
+    books: [
+      { id: 'm4-b1', name: 'Church Growth',                    chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm4-b2', name: 'Mega Church',                      chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm4-b3', name: 'Church Planting',                  chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm4-b4', name: 'Double Mega Missionary Church',    chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm4-b5', name: '1000 Micro Churches',              chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm4-b6', name: 'The Church Must Send',             chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm4-b7', name: 'Why Is This Church Not Working?',  chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm4-b8', name: 'The Gift Of Governments',          chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm4-b9', name: 'Church Administration',            chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
     ],
   },
   {
     id: 'm5', name: 'The Anointing', code: 'A',
-    topics: [
-      'Catch the Anointing','Steps to the Anointing','Amplify Your Ministry',
-      'Sweet Influences of the Anointing','The Anointing and the Presence',
-      'The Anointed and the Anointing','Steps to God\'s Presence',
-      'Flow in the Anointing','The Love of the Spirit',
+    books: [
+      { id: 'm5-b1', name: 'Catch the Anointing',                    chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm5-b2', name: 'Steps to the Anointing',                 chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm5-b3', name: 'Amplify Your Ministry',                  chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm5-b4', name: 'Sweet Influences of the Anointing',      chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm5-b5', name: 'The Anointing and the Presence',         chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm5-b6', name: 'The Anointed and the Anointing',         chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm5-b7', name: "Steps to God's Presence",                chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm5-b8', name: 'Flow in the Anointing',                  chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm5-b9', name: 'The Love of the Spirit',                 chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
     ],
   },
   {
     id: 'm6', name: 'Evangelism', code: 'E',
-    topics: [
-      'How You Can Preach Salvation','Anagkazo','Others','Tell Them',
-      'Make Yourselves Saviours of Men','People Who Went to Hell','Blood Power',
+    books: [
+      { id: 'm6-b1', name: 'How You Can Preach Salvation',     chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm6-b2', name: 'Anagkazo',                         chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm6-b3', name: 'Others',                           chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm6-b4', name: 'Tell Them',                        chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm6-b5', name: 'Make Yourselves Saviours of Men',  chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm6-b6', name: 'People Who Went to Hell',          chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm6-b7', name: 'Blood Power',                      chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
     ],
   },
   {
     id: 'm7', name: 'Pastoral Ministry', code: 'PM',
-    topics: [
-      'Transform Your Pastoral Ministry',
-      'What It Means to Become a Shepherd',
-      'The Art of Shepherding',
-      'Lord, I Know You Need Somebody',
-      'Top Ten Mistakes that Pastors Make','Laikos',
+    books: [
+      { id: 'm7-b1', name: 'Transform Your Pastoral Ministry',       chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm7-b2', name: 'What It Means to Become a Shepherd',     chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm7-b3', name: 'The Art of Shepherding',                 chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm7-b4', name: 'Lord, I Know You Need Somebody',         chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm7-b5', name: 'Top Ten Mistakes that Pastors Make',     chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm7-b6', name: 'Laikos',                                 chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
     ],
   },
   {
     id: 'm8', name: 'Prayer', code: 'Pr',
-    topics: [
-      '100% Answered Prayer','Prayer Changes Things','How to Pray',
-      'Everything by Prayer Nothing Without Prayer',
-      'Flow Prayer Book','Prayer Opportunities',
+    books: [
+      { id: 'm8-b1', name: '100% Answered Prayer',                               chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm8-b2', name: 'Prayer Changes Things',                               chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm8-b3', name: 'How to Pray',                                         chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm8-b4', name: 'Everything by Prayer Nothing Without Prayer',         chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm8-b5', name: 'Flow Prayer Book',                                    chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm8-b6', name: 'Prayer Opportunities',                                chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
     ],
   },
   {
     id: 'm9', name: 'Leadership', code: 'Le',
-    topics: [
-      'The Art of Leadership','Wise as Serpents',
-      'Wisdom is the Principal Thing','The Determinants',
+    books: [
+      { id: 'm9-b1', name: 'The Art of Leadership',           chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm9-b2', name: 'Wise as Serpents',                chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm9-b3', name: 'Wisdom is the Principal Thing',   chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm9-b4', name: 'The Determinants',                chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
     ],
   },
   {
     id: 'm10', name: 'The Arts', code: 'TA',
-    topics: [
-      'The Art of Following','The Art of Leadership',
-      'The Art of Shepherding','The Art of Hearing',
+    books: [
+      { id: 'm10-b1', name: 'The Art of Following',    chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm10-b2', name: 'The Art of Leadership',   chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm10-b3', name: 'The Art of Shepherding',  chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm10-b4', name: 'The Art of Hearing',      chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
     ],
   },
   {
     id: 'm11', name: 'The Secrets', code: 'TS',
-    topics: ['Faith Secrets','Hope Secrets','Victory Secrets','Enlargement Secrets'],
-  },
-  {
-    id: 'm12', name: 'Finances', code: 'F',
-    topics: [
-      'He that Hath','Why Non-tithing Christians Become Poor',
-      'Labour to be Blessed','Neutralize the Curse',
+    books: [
+      { id: 'm11-b1', name: 'Faith Secrets',        chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm11-b2', name: 'Hope Secrets',         chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm11-b3', name: 'Victory Secrets',      chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm11-b4', name: 'Enlargement Secrets',  chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
     ],
   },
   {
-    id: 'm13', name: 'Marriage', code: 'M',
-    topics: [
-      'Model Marriage','The Beauty, the Beast and the Pastor',
-      'Jezebel, a Woman out of Order','Ppikos Maso',
+    id: 'm12', name: 'Finances', code: 'Fi',
+    books: [
+      { id: 'm12-b1', name: 'He that Hath',                              chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm12-b2', name: 'Why Non-tithing Christians Become Poor',    chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm12-b3', name: 'Labour to be Blessed',                      chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm12-b4', name: 'Neutralize the Curse',                      chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+    ],
+  },
+  {
+    id: 'm13', name: 'Marriage', code: 'Ma',
+    books: [
+      { id: 'm13-b1', name: 'Model Marriage',                    chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm13-b2', name: 'The Beauty, the Beast and the Pastor', chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm13-b3', name: 'Jezebel, a Woman out of Order',     chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm13-b4', name: 'Ppikos Maso',                       chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
     ],
   },
   {
     id: 'm14', name: 'War', code: 'War',
-    topics: ['A Good General','Now We Are at War'],
+    books: [
+      { id: 'm14-b1', name: 'A Good General',    chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm14-b2', name: 'Now We Are at War', chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+    ],
   },
   {
     id: 'm15', name: 'Demonology', code: 'D',
-    topics: ['Demons and How to Deal with Them','Know Your Invisible Enemies'],
+    books: [
+      { id: 'm15-b1', name: 'Demons and How to Deal with Them', chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm15-b2', name: 'Know Your Invisible Enemies',      chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+    ],
   },
   {
     id: 'm16', name: 'Strong Christian', code: 'SC',
-    topics: [
-      'How to be Born Again and Avoid Hell',
-      'How You Can be a Strong Christian','Seven Great Principles',
-      'Read Your Bible','Spiritual Dangers','How Can I Say Thanks',
-      'Daughter, You Can Make It','Backsliding','Forgiveness Made Easy',
-      'How You Can Have an Effective Quiet Time',
-      'Name it! Claim it! Take It!',
-      'Who is He that Overcometh the World?',
+    books: [
+      { id: 'm16-b1',  name: 'How to be Born Again and Avoid Hell',              chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm16-b2',  name: 'How You Can be a Strong Christian',                chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm16-b3',  name: 'Seven Great Principles',                           chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm16-b4',  name: 'Read Your Bible',                                  chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm16-b5',  name: 'Spiritual Dangers',                                chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm16-b6',  name: 'How Can I Say Thanks',                             chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm16-b7',  name: 'Daughter, You Can Make It',                        chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm16-b8',  name: 'Backsliding',                                      chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm16-b9',  name: 'Forgiveness Made Easy',                            chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm16-b10', name: 'How You Can Have an Effective Quiet Time',         chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm16-b11', name: 'Name it! Claim it! Take It!',                      chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm16-b12', name: 'Who is He that Overcometh the World?',             chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
     ],
   },
   {
     id: 'm17', name: 'Church History', code: 'CH',
-    topics: [
-      'History of Lighthouse Chapel Vol. 1',
-      'History of Lighthouse Chapel Vol. 2',
-      'History of Lighthouse Chapel Vol. 3',
+    books: [
+      { id: 'm17-b1', name: 'History of Lighthouse Chapel Vol. 1', chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm17-b2', name: 'History of Lighthouse Chapel Vol. 2', chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+      { id: 'm17-b3', name: 'History of Lighthouse Chapel Vol. 3', chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
     ],
   },
   {
     id: 'm18', name: 'Gift of Governance', code: 'GoG',
-    topics: Array.from({ length: 60 }, (_, i) => `Chapter ${i + 1}`),
+    books: Array.from({ length: 60 }, (_, i) => ({
+      id: `m18-b${i + 1}`,
+      name: `Chapter ${i + 1}`,
+      chapters: ['Part 1', 'Part 2', 'Part 3'],
+    })),
   },
   {
     id: 'm19', name: 'Bible Technology', code: 'BT',
-    topics: ['Bible Technology Materials'],
+    books: [
+      { id: 'm19-b1', name: 'Bible Technology Materials', chapters: ['Chapter 1','Chapter 2','Chapter 3'] },
+    ],
   },
 ]
 
@@ -235,23 +313,23 @@ function daysAgo(n: number): string {
 
 export const SESSIONS: Session[] = [
   // Makarios class (cls1) — all sessions taught by t1
-  { id: 'ses1',  classId: 'cls1', moduleId: 'm1', teacherId: 't1', date: daysAgo(28), topicIndex: 0 },
-  { id: 'ses2',  classId: 'cls1', moduleId: 'm1', teacherId: 't1', date: daysAgo(21), topicIndex: 1 },
-  { id: 'ses3',  classId: 'cls1', moduleId: 'm2', teacherId: 't1', date: daysAgo(20), topicIndex: 0 },
-  { id: 'ses4',  classId: 'cls1', moduleId: 'm2', teacherId: 't1', date: daysAgo(14), topicIndex: 1 },
-  { id: 'ses5',  classId: 'cls1', moduleId: 'm3', teacherId: 't1', date: daysAgo(13), topicIndex: 0 },
-  { id: 'ses6',  classId: 'cls1', moduleId: 'm1', teacherId: 't1', date: daysAgo(7),  topicIndex: 2 },
-  { id: 'ses7',  classId: 'cls1', moduleId: 'm2', teacherId: 't1', date: daysAgo(3),  topicIndex: 2 },
-  { id: 'ses8',  classId: 'cls1', moduleId: 'm3', teacherId: 't1', date: today,        topicIndex: 1 },
+  { id: 'ses1',  classId: 'cls1', moduleId: 'm1', teacherId: 't1', date: daysAgo(28), bookId: 'm1-b1', chapterIndex: 0 },
+  { id: 'ses2',  classId: 'cls1', moduleId: 'm1', teacherId: 't1', date: daysAgo(21), bookId: 'm1-b2', chapterIndex: 0 },
+  { id: 'ses3',  classId: 'cls1', moduleId: 'm2', teacherId: 't1', date: daysAgo(20), bookId: 'm2-b1', chapterIndex: 0 },
+  { id: 'ses4',  classId: 'cls1', moduleId: 'm2', teacherId: 't1', date: daysAgo(14), bookId: 'm2-b2', chapterIndex: 0 },
+  { id: 'ses5',  classId: 'cls1', moduleId: 'm3', teacherId: 't1', date: daysAgo(13), bookId: 'm3-b1', chapterIndex: 0 },
+  { id: 'ses6',  classId: 'cls1', moduleId: 'm1', teacherId: 't1', date: daysAgo(7),  bookId: 'm1-b3', chapterIndex: 0 },
+  { id: 'ses7',  classId: 'cls1', moduleId: 'm2', teacherId: 't1', date: daysAgo(3),  bookId: 'm2-b3', chapterIndex: 0 },
+  { id: 'ses8',  classId: 'cls1', moduleId: 'm3', teacherId: 't1', date: today,        bookId: 'm3-b2', chapterIndex: 0 },
   // Poimen class (cls2) — all sessions taught by t2
-  { id: 'ses9',  classId: 'cls2', moduleId: 'm1', teacherId: 't2', date: daysAgo(27), topicIndex: 0 },
-  { id: 'ses10', classId: 'cls2', moduleId: 'm2', teacherId: 't2', date: daysAgo(20), topicIndex: 0 },
-  { id: 'ses11', classId: 'cls2', moduleId: 'm1', teacherId: 't2', date: daysAgo(18), topicIndex: 1 },
-  { id: 'ses12', classId: 'cls2', moduleId: 'm3', teacherId: 't2', date: daysAgo(13), topicIndex: 0 },
-  { id: 'ses13', classId: 'cls2', moduleId: 'm2', teacherId: 't2', date: daysAgo(11), topicIndex: 1 },
-  { id: 'ses14', classId: 'cls2', moduleId: 'm1', teacherId: 't2', date: daysAgo(6),  topicIndex: 2 },
-  { id: 'ses15', classId: 'cls2', moduleId: 'm3', teacherId: 't2', date: daysAgo(2),  topicIndex: 1 },
-  { id: 'ses16', classId: 'cls2', moduleId: 'm4', teacherId: 't2', date: today,        topicIndex: 0 },
+  { id: 'ses9',  classId: 'cls2', moduleId: 'm1', teacherId: 't2', date: daysAgo(27), bookId: 'm1-b1', chapterIndex: 0 },
+  { id: 'ses10', classId: 'cls2', moduleId: 'm2', teacherId: 't2', date: daysAgo(20), bookId: 'm2-b1', chapterIndex: 0 },
+  { id: 'ses11', classId: 'cls2', moduleId: 'm1', teacherId: 't2', date: daysAgo(18), bookId: 'm1-b2', chapterIndex: 0 },
+  { id: 'ses12', classId: 'cls2', moduleId: 'm3', teacherId: 't2', date: daysAgo(13), bookId: 'm3-b1', chapterIndex: 0 },
+  { id: 'ses13', classId: 'cls2', moduleId: 'm2', teacherId: 't2', date: daysAgo(11), bookId: 'm2-b2', chapterIndex: 0 },
+  { id: 'ses14', classId: 'cls2', moduleId: 'm1', teacherId: 't2', date: daysAgo(6),  bookId: 'm1-b3', chapterIndex: 0 },
+  { id: 'ses15', classId: 'cls2', moduleId: 'm3', teacherId: 't2', date: daysAgo(2),  bookId: 'm3-b2', chapterIndex: 0 },
+  { id: 'ses16', classId: 'cls2', moduleId: 'm4', teacherId: 't2', date: today,        bookId: 'm4-b1', chapterIndex: 0 },
 ]
 
 // ─── Attendance ───────────────────────────────────────────────────────────────
@@ -387,21 +465,21 @@ export function getClassAttendanceRate(classId: string): number {
   return Math.round(rates.reduce((a, b) => a + b, 0) / rates.length)
 }
 
-// Per-topic stats for a module: taught status + attendance rate per topic
-export function getModuleTopicStats(moduleId: string): { topic: string; sessions: number; attendanceRate: number; taught: boolean }[] {
+// Per-book stats for a module: taught status + attendance rate per book
+export function getModuleBookStats(moduleId: string): { book: Book; sessions: number; attendanceRate: number; taught: boolean }[] {
   const mod = getModuleById(moduleId)
   if (!mod) return []
   const allSessions = getAllSessions().filter(s => s.moduleId === moduleId)
-  return mod.topics.map((topic, i) => {
-    const topicSessions = allSessions.filter(s => s.topicIndex === i)
-    if (topicSessions.length === 0) return { topic, sessions: 0, attendanceRate: 0, taught: false }
+  return mod.books.map(book => {
+    const bookSessions = allSessions.filter(s => s.bookId === book.id)
+    if (bookSessions.length === 0) return { book, sessions: 0, attendanceRate: 0, taught: false }
     let present = 0, total = 0
-    for (const session of topicSessions) {
+    for (const session of bookSessions) {
       const att = getAttendanceForSession(session.id)
       present += att.filter(a => a.status === 'present').length
       total += att.length
     }
-    return { topic, sessions: topicSessions.length, attendanceRate: total > 0 ? Math.round((present / total) * 100) : 0, taught: true }
+    return { book, sessions: bookSessions.length, attendanceRate: total > 0 ? Math.round((present / total) * 100) : 0, taught: true }
   })
 }
 
@@ -420,13 +498,13 @@ export function getModuleAttendanceRate(moduleId: string): number {
 // backward compat
 export function getCourseAverageAttendance(id: string): number { return getModuleAttendanceRate(id) }
 
-// Module completion rate: % of topics that have been taught at least once
+// Module completion rate: % of books that have been taught at least once
 export function getModuleCompletionRate(moduleId: string): number {
   const mod = MODULES.find(m => m.id === moduleId)
-  if (!mod || mod.topics.length === 0) return 0
+  if (!mod || mod.books.length === 0) return 0
   const sessions = getAllSessions().filter(s => s.moduleId === moduleId)
-  const coveredIndices = new Set(sessions.map(s => s.topicIndex))
-  return Math.round((coveredIndices.size / mod.topics.length) * 100)
+  const taughtBookIds = new Set(sessions.map(s => s.bookId))
+  return Math.round((taughtBookIds.size / mod.books.length) * 100)
 }
 
 // Institution-wide attendance rate
@@ -509,16 +587,24 @@ export function getStudentsForModule(_moduleId: string): Student[] {
 
 // ─── Recent attendance history ────────────────────────────────────────────────
 
-export function getRecentAttendanceHistory(studentId: string, limit = 10): { date: string; moduleName: string; status: 'present' | 'absent' }[] {
+export function getRecentAttendanceHistory(studentId: string, limit = 10): { date: string; moduleName: string; bookName: string; chapterName: string; status: 'present' | 'absent' }[] {
   const student = STUDENTS.find(s => s.id === studentId)
   if (!student) return []
   const sessions = getSessionsByClass(student.classId).sort((a, b) => b.date.localeCompare(a.date))
-  const results: { date: string; moduleName: string; status: 'present' | 'absent' }[] = []
+  const results: { date: string; moduleName: string; bookName: string; chapterName: string; status: 'present' | 'absent' }[] = []
   for (const session of sessions) {
     const record = getAllAttendance().find(a => a.sessionId === session.id && a.studentId === studentId)
     if (record) {
       const mod = MODULES.find(m => m.id === session.moduleId)
-      results.push({ date: session.date, moduleName: mod?.name ?? 'Unknown Module', status: record.status })
+      const book = mod?.books.find(b => b.id === session.bookId)
+      const chapterName = book?.chapters[session.chapterIndex] ?? `Chapter ${session.chapterIndex + 1}`
+      results.push({
+        date: session.date,
+        moduleName: mod?.name ?? 'Unknown Module',
+        bookName: book?.name ?? 'Unknown Book',
+        chapterName,
+        status: record.status,
+      })
     }
     if (results.length >= limit) break
   }
@@ -617,16 +703,17 @@ export function submitSession(params: {
   moduleId: string
   teacherId: string
   date: string
-  topicIndex: number
+  bookId: string
+  chapterIndex: number
   records: { studentId: string; status: 'present' | 'absent'; participationLevel?: 1 | 2 | 3 | 4 }[]
 }): { success: boolean; error?: string } {
   const existing = getAllSessions().find(
     s => s.classId === params.classId && s.date === params.date &&
-         s.moduleId === params.moduleId && s.topicIndex === params.topicIndex
+         s.moduleId === params.moduleId && s.bookId === params.bookId && s.chapterIndex === params.chapterIndex
   )
-  if (existing) return { success: false, error: 'Attendance for this topic in this class has already been recorded today.' }
+  if (existing) return { success: false, error: 'Attendance for this chapter in this class has already been recorded today.' }
   const sessionId = `rt-${Date.now()}`
-  runtimeSessions.push({ id: sessionId, classId: params.classId, moduleId: params.moduleId, teacherId: params.teacherId, date: params.date, topicIndex: params.topicIndex })
+  runtimeSessions.push({ id: sessionId, classId: params.classId, moduleId: params.moduleId, teacherId: params.teacherId, date: params.date, bookId: params.bookId, chapterIndex: params.chapterIndex })
   params.records.forEach((r, i) => {
     runtimeAttendance.push({
       id: `rta-${sessionId}-${i}`,
