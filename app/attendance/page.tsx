@@ -214,7 +214,7 @@ export default function AttendancePage() {
                     <div className="space-y-1">
                       <span className="text-[10px] font-bold uppercase tracking-wider font-label text-secondary-dim">{module.code}</span>
                       <h3 className="text-base font-bold text-on-surface font-headline">{module.name}</h3>
-                      <p className="text-xs text-on-surface-variant/60 font-label">{sessions} sessions · {module.topics.length} topics</p>
+                      <p className="text-xs text-on-surface-variant/60 font-label">{sessions} sessions · {module.books.length} books</p>
                     </div>
                     <div className="flex flex-col items-end">
                       <span className={`text-xl font-bold font-headline ${statusColor}`}>{rate}%</span>
@@ -303,7 +303,7 @@ export default function AttendancePage() {
                         </div>
                         <div>
                           <h4 className="font-bold text-base leading-tight text-on-surface">{module.name}</h4>
-                          <p className="text-on-surface-variant/60 text-xs font-label mt-0.5">{sessions} sessions · {module.topics.length} topics</p>
+                          <p className="text-on-surface-variant/60 text-xs font-label mt-0.5">{sessions} sessions · {module.books.length} books</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-6 md:gap-8 shrink-0">

@@ -114,7 +114,7 @@ export default function CourseDirectoryClient({ courses, rates }: Props) {
                   <h3 className="font-headline text-lg font-bold text-on-surface leading-tight mb-1">{c.name}</h3>
                   <div className="flex items-center gap-2 text-on-surface-variant/60 text-sm font-label">
                     <BookOpen size={14} />
-                    <span>{c.topics.length} topics · {c.code}</span>
+                    <span>{c.books.length} books · {c.code}</span>
                   </div>
                 </div>
                 <div

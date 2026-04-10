@@ -75,8 +75,8 @@ export default function CourseCard({ course, avgRate, teacherName }: Props) {
           <span className="text-sm font-medium text-on-surface font-label">{course.code}</span>
         </div>
         <div className="flex flex-col gap-1">
-          <span className="text-[10px] uppercase tracking-tighter font-bold text-on-surface-variant/60 font-label">Topics</span>
-          <span className="text-sm font-medium text-on-surface font-label">{course.topics.length} topics</span>
+          <span className="text-[10px] uppercase tracking-tighter font-bold text-on-surface-variant/60 font-label">Books</span>
+          <span className="text-sm font-medium text-on-surface font-label">{course.books.length} books</span>
         </div>
       </div>
     </Link>
