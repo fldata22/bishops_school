@@ -2,8 +2,10 @@
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { Users, ChalkboardTeacher, BookOpen, GraduationCap, Church, List, X } from '@phosphor-icons/react'
-import BottomNav from './BottomNav'
+import {
+  Users, ChalkboardTeacher, BookOpen, GraduationCap, CalendarCheck,
+  SquaresFour, List, X,
+} from '@phosphor-icons/react'
 
 const adminLinks = [
   { href: '/admin/classes',    label: 'Classes',    Icon: GraduationCap },
@@ -26,12 +28,10 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const pathname = usePathname()
   const [drawerOpen, setDrawerOpen] = useState(false)
 
-  // Close drawer when route changes
   useEffect(() => {
     setDrawerOpen(false)
   }, [pathname])
 
-  // Lock body scroll when drawer is open
   useEffect(() => {
     if (drawerOpen) {
       document.body.style.overflow = 'hidden'
@@ -121,28 +121,6 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         </div>
       </header>
 
-      {/* Top header — mobile, with hamburger */}
-      <header
-        className="md:hidden fixed top-0 left-0 right-0 h-14 z-40 flex items-center px-4 gap-3 border-b border-white/[0.06]"
-        style={{
-          background: 'rgba(7,7,15,0.85)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-        }}
-      >
-        <button
-          onClick={() => setDrawerOpen(true)}
-          aria-label="Open admin menu"
-          className="w-10 h-10 -ml-2 rounded-lg flex items-center justify-center text-on-surface-variant/70 hover:text-on-surface hover:bg-white/[0.04] active:scale-95 transition-all"
-        >
-          <List size={22} />
-        </button>
-        <div className="flex flex-col leading-tight">
-          <p className="text-[10px] text-on-surface-variant/40 uppercase tracking-widest font-label">Admin</p>
-          <p className="text-sm font-headline font-bold text-on-surface">{currentLabel}</p>
-        </div>
-      </header>
-
       {/* Mobile drawer backdrop */}
       {drawerOpen && (
         <div
@@ -154,7 +132,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
       {/* Mobile drawer */}
       <aside
-        className={`md:hidden fixed top-0 left-0 h-full w-72 max-w-[85vw] z-50 flex flex-col py-6 px-4 border-r border-white/[0.08] transition-transform duration-300 ease-out
+        className={`md:hidden fixed top-0 left-0 h-full w-72 max-w-[85vw] z-50 flex flex-col py-6 px-4 border-r border-white/[0.08] overflow-y-auto transition-transform duration-300 ease-out
           ${drawerOpen ? 'translate-x-0' : '-translate-x-full'}`}
         style={{
           background: 'rgba(7,7,15,0.96)',
@@ -163,17 +141,19 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         }}
         aria-hidden={!drawerOpen}
       >
-        <div className="flex items-center justify-between px-4 pt-2 pb-6">
-          <p className="text-[10px] text-on-surface-variant/40 uppercase tracking-widest font-label">Admin</p>
+        <div className="flex items-center justify-between px-4 pt-2 pb-4">
+          <p className="text-[10px] text-on-surface-variant/40 uppercase tracking-widest font-label">Bishops School</p>
           <button
             onClick={() => setDrawerOpen(false)}
-            aria-label="Close admin menu"
+            aria-label="Close menu"
             className="w-9 h-9 -mr-2 rounded-lg flex items-center justify-center text-on-surface-variant/70 hover:text-on-surface hover:bg-white/[0.04] active:scale-95 transition-all"
           >
             <X size={20} />
           </button>
         </div>
-        <nav className="flex-1 space-y-1">
+
+        <p className="px-4 pt-2 pb-2 text-[10px] text-on-surface-variant/40 uppercase tracking-widest font-label">Admin</p>
+        <nav className="space-y-1 mb-4">
           {adminLinks.map(({ href, label, Icon }) => {
             const active = pathname === href || pathname.startsWith(href)
             return (
@@ -193,17 +173,27 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
             )
           })}
         </nav>
+
+        <p className="px-4 pt-2 pb-2 text-[10px] text-on-surface-variant/40 uppercase tracking-widest font-label">App</p>
+        <nav className="space-y-1">
+          {mainLinks.map(({ href, label, Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setDrawerOpen(false)}
+              className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm border border-transparent text-on-surface-variant/45 hover:text-on-surface/70 hover:bg-surface/[0.04] transition-all"
+            >
+              <Icon size={20} />
+              <span className="font-label font-medium">{label}</span>
+            </Link>
+          ))}
+        </nav>
       </aside>
 
       {/* Main content */}
-      <main className="md:ml-64 pt-14 md:pt-16 pb-20 md:pb-12 min-h-[100dvh]">
+      <main className="md:ml-64 pt-14 md:pt-16 pb-12 min-h-[100dvh]">
         {children}
       </main>
-
-      {/* Mobile bottom nav — reuse global nav */}
-      <div className="fixed bottom-0 left-0 right-0 md:hidden z-40">
-        <BottomNav currentPath={pathname} />
-      </div>
     </div>
   )
 }
