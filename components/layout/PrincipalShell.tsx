@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import {
   SquaresFour, CalendarCheck, BookOpen, Users, ChalkboardTeacher, GearSix,
   GraduationCap, List, X,
@@ -133,7 +132,7 @@ export default function PrincipalShell({ children }: { children: React.ReactNode
         </nav>
 
         {/* User profile in drawer */}
-        <div
+        {/* <div
           className="mt-auto border border-white/[0.08] rounded-xl px-3 py-3 flex items-center gap-3"
           style={{ background: 'rgba(255,255,255,0.04)' }}
         >
@@ -150,7 +149,7 @@ export default function PrincipalShell({ children }: { children: React.ReactNode
             <p className="text-sm font-semibold truncate text-on-surface">Dr. Julian Vance</p>
             <p className="text-[10px] text-on-surface-variant/45 uppercase tracking-widest font-label">Admin</p>
           </div>
-        </div>
+        </div> */}
       </aside>
 
       {/* Main content */}
