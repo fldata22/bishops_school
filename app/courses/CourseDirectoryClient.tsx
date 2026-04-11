@@ -2,15 +2,14 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import type { ApiModule } from '@/lib/api-types'
-import { MagnifyingGlass, BookOpen, Funnel } from '@phosphor-icons/react'
+import { MagnifyingGlass, Funnel } from '@phosphor-icons/react'
 import CourseCard from '@/components/ui/CourseCard'
 
 interface Props {
   courses: ApiModule[]
-  rates: Record<number, number>
 }
 
-export default function CourseDirectoryClient({ courses, rates }: Props) {
+export default function CourseDirectoryClient({ courses }: Props) {
   const [query, setQuery] = useState('')
 
   const filtered = courses.filter(c =>
@@ -81,7 +80,7 @@ export default function CourseDirectoryClient({ courses, rates }: Props) {
       {/* Desktop grid */}
       <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-6">
         {filtered.map(c => (
-          <CourseCard key={c.id} course={c} avgRate={rates[c.id] ?? 0} />
+          <CourseCard key={c.id} course={c} />
         ))}
         {filtered.length === 0 && (
           <p className="text-sm font-label text-on-surface-variant/60 col-span-3">No modules match your search.</p>
@@ -89,47 +88,24 @@ export default function CourseDirectoryClient({ courses, rates }: Props) {
       </div>
 
       {/* Mobile list */}
-      <div className="md:hidden space-y-4">
-        {filtered.map(c => {
-          const rate = rates[c.id] ?? 0
-          const badgeBg = rate >= 80 ? 'rgba(6,182,212,0.1)' : rate >= 65 ? 'rgba(124,58,237,0.1)' : 'rgba(244,63,94,0.1)'
-          const badgeBorder = rate >= 80 ? 'rgba(6,182,212,0.25)' : rate >= 65 ? 'rgba(124,58,237,0.25)' : 'rgba(244,63,94,0.25)'
-          const badgeColor = rate >= 80 ? 'text-secondary-dim' : rate >= 65 ? 'text-primary-dim' : 'text-tertiary-dim'
-          const badgeSubColor = rate >= 80 ? 'text-secondary/70' : rate >= 65 ? 'text-primary/70' : 'text-tertiary/70'
-
-          return (
-            <Link
-              key={c.id}
-              href={`/courses/${c.id}`}
-              className="block rounded-xl p-5 flex flex-col gap-4 relative overflow-hidden active:scale-[0.98] transition-transform duration-200 border"
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                borderColor: 'rgba(255,255,255,0.07)',
-              }}
-            >
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <h3 className="font-headline text-lg font-bold text-on-surface leading-tight mb-1">{c.name}</h3>
-                  <div className="flex items-center gap-2 text-on-surface-variant/60 text-sm font-label">
-                    <BookOpen size={14} />
-                    <span>{c.books.length} books · {c.code}</span>
-                  </div>
-                </div>
-                <div
-                  className={`px-3 py-2 rounded-xl text-center border`}
-                  style={{ background: badgeBg, borderColor: badgeBorder }}
-                >
-                  <span className={`font-bold text-lg leading-none ${badgeColor}`}>{rate}%</span>
-                  <p className={`text-[10px] uppercase tracking-tighter mt-1 ${badgeSubColor}`}>Completion</p>
-                </div>
-              </div>
-              <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"
-                style={{ background: 'rgba(6,182,212,0.05)' }} />
-            </Link>
-          )
-        })}
+      <div className="md:hidden space-y-3">
+        {filtered.map(c => (
+          <Link
+            key={c.id}
+            href={`/courses/${c.id}`}
+            className="block rounded-xl p-4 relative overflow-hidden active:scale-[0.98] transition-transform duration-200 border"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              borderColor: 'rgba(255,255,255,0.07)',
+            }}
+          >
+            <h3 className="font-headline text-base font-bold text-on-surface leading-tight">{c.name}</h3>
+            <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"
+              style={{ background: 'rgba(6,182,212,0.05)' }} />
+          </Link>
+        ))}
         {filtered.length === 0 && (
           <p className="text-sm font-label text-on-surface-variant/60">No modules match your search.</p>
         )}

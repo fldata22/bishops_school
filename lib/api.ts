@@ -216,6 +216,14 @@ export const api = {
   deleteSession: (id: number) =>
     request<void>(`/sessions/${id}`, { method: 'DELETE' }),
 
+  // Individual attendance record updates
+  updateAttendance: (
+    id: number,
+    body: { status?: 'present' | 'absent'; participation_level?: number | null }
+  ) => request<ApiAttendanceRecord>(`/attendance/${id}`, { method: 'PATCH', body }),
+  deleteAttendance: (id: number) =>
+    request<void>(`/attendance/${id}`, { method: 'DELETE' }),
+
   // Composite endpoints
   getDashboard: () => request<DashboardData>('/dashboard'),
   getAttendanceOverview: () =>

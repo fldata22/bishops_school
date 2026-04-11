@@ -148,8 +148,8 @@ export default async function AttendancePage() {
               const statusLabel = cls.rate >= 80 ? 'High Stability' : cls.rate >= 65 ? 'Attention Required' : 'Critical'
               const statusColor = cls.rate >= 80 ? 'text-secondary-dim' : cls.rate >= 65 ? 'text-on-surface' : 'text-tertiary-dim'
               return (
-                <div key={`mob-${cls.class_id}`}
-                  className="block p-5 rounded-3xl border border-white/[0.07] relative overflow-hidden group"
+                <Link key={`mob-${cls.class_id}`} href={`/attendance/class/${cls.class_id}`}
+                  className="block p-5 rounded-3xl border border-white/[0.07] relative overflow-hidden group active:scale-[0.98] transition-transform"
                   style={glassCard}>
                   <div className="absolute top-0 right-0 w-32 h-32 rounded-full -mr-16 -mt-16 blur-3xl" style={{ background: 'rgba(124,58,237,0.06)' }} />
                   <div className="flex justify-between items-start relative z-10">
@@ -170,7 +170,7 @@ export default async function AttendancePage() {
                       <span>{cls.present}/{cls.total} Students Present</span>
                     </div>
                   </div>
-                </div>
+                </Link>
               )
             })}
           </div>
@@ -224,8 +224,8 @@ export default async function AttendancePage() {
                 const { badge, bar, barWidth } = presenceBadgeClass(cls.rate)
                 const timeLabel = `${cls.total} students · ${cls.sessions_this_month} sessions this month`
                 return (
-                  <div key={cls.class_id}
-                    className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-5 md:p-6 rounded-xl border border-white/[0.07]"
+                  <Link key={cls.class_id} href={`/attendance/class/${cls.class_id}`}
+                    className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-5 md:p-6 rounded-xl border border-white/[0.07] hover:border-white/[0.12] transition-colors"
                     style={glassRow}>
                     <div className="flex items-center gap-5">
                       <div
@@ -251,7 +251,7 @@ export default async function AttendancePage() {
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 )
               })}
             </div>
@@ -392,7 +392,7 @@ export default async function AttendancePage() {
       {/* Mobile FAB */}
       <Link
         href="/attend"
-        className="fixed bottom-24 right-6 z-40 md:hidden w-14 h-14 rounded-2xl flex items-center justify-center active:scale-95 transition-transform"
+        className="fixed bottom-6 right-6 z-40 md:hidden w-14 h-14 rounded-2xl flex items-center justify-center active:scale-95 transition-transform"
         style={{ background: 'linear-gradient(135deg, #7c3aed, #06b6d4)', boxShadow: '0 0 24px rgba(124,58,237,0.5)' }}
       >
         <Plus size={28} className="text-white" weight="bold" />

@@ -2,12 +2,13 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import {
-  SquaresFour, CalendarCheck, BookOpen, Users, ChalkboardTeacher, GearSix
+  SquaresFour, CalendarCheck, BookOpen, Users, ChalkboardTeacher, GearSix, GraduationCap,
 } from '@phosphor-icons/react'
 
 const navItems = [
   { href: '/dashboard',  label: 'Dashboard',  Icon: SquaresFour },
   { href: '/attendance', label: 'Attendance', Icon: CalendarCheck },
+  { href: '/classes',    label: 'Classes',    Icon: GraduationCap },
   { href: '/courses',    label: 'Modules',    Icon: BookOpen },
   { href: '/students',   label: 'Students',   Icon: Users },
   { href: '/teachers',   label: 'Teachers',   Icon: ChalkboardTeacher },

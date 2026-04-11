@@ -305,16 +305,22 @@ export default function AdminModulesPage() {
                     <div className="space-y-1">
                       {mod.books.map(book => (
                         <div key={book.id}>
-                          {/* Book row */}
+                          {/* Book row — whole row clickable to toggle chapters */}
                           <div className="flex items-center gap-2 py-2">
-                            <div className="flex-1 min-w-0">
-                              {editingBookId === book.id ? (
+                            {editingBookId === book.id ? (
+                              <div className="flex-1 min-w-0">
                                 <input value={editBookName} onChange={e => setEditBookName(e.target.value)} className={`${inputClass} w-full`} style={inputStyle} />
-                              ) : (
-                                <span className="text-sm text-on-surface/80 font-label">{book.name}</span>
-                              )}
-                            </div>
-                            <span className="text-[10px] text-on-surface-variant/35 font-label shrink-0">{book.chapters.length} ch</span>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => toggleBookExpand(book.id)}
+                                className="flex-1 min-w-0 flex items-center gap-2 text-left hover:text-on-surface transition-colors"
+                              >
+                                <span className="text-on-surface-variant/40 text-xs shrink-0">{expandedBookId === book.id ? '▾' : '▸'}</span>
+                                <span className="text-sm text-on-surface/80 font-label truncate">{book.name}</span>
+                                <span className="text-[10px] text-on-surface-variant/35 font-label shrink-0">{book.chapters.length} ch</span>
+                              </button>
+                            )}
                             <div className="flex items-center gap-1.5 shrink-0">
                               {editingBookId === book.id ? (
                                 <>
@@ -331,12 +337,6 @@ export default function AdminModulesPage() {
                                 </>
                               ) : (
                                 <>
-                                  <button
-                                    onClick={() => toggleBookExpand(book.id)}
-                                    className={`px-2.5 py-1.5 md:py-0.5 rounded text-[10px] font-label border transition-colors ${expandedBookId === book.id ? 'bg-secondary/10 text-secondary-dim border-secondary/20' : 'text-on-surface-variant/50 border-white/[0.06] hover:text-on-surface'}`}
-                                  >
-                                    Chapters
-                                  </button>
                                   <button onClick={() => startEditBook(book.id, book.name)} className="px-2.5 py-1.5 md:py-0.5 rounded text-[10px] font-label text-on-surface-variant/50 border border-white/[0.06] hover:text-on-surface transition-colors">
                                     Edit
                                   </button>

@@ -123,7 +123,6 @@ export default async function DashboardPage() {
                       <p className="text-sm font-semibold text-on-surface truncate">
                         {teacher.name}
                       </p>
-                      <p className={`text-[10px] font-label ${text}`}>{teacher.rating}</p>
                     </div>
                     <span className={`text-xl font-black font-headline ${text}`}>
                       {teacher.rate}%
