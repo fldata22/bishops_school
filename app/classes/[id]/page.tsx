@@ -47,12 +47,6 @@ export default async function ClassDetailPage({ params }: { params: { id: string
     }
   })
 
-  const categoryLabel = schoolClass.category === 'non_consecrated'
-    ? 'Non-Consecrated'
-    : schoolClass.category === 'newly_consecrated'
-      ? 'Newly Consecrated'
-      : null
-
   return (
     <PrincipalShell>
       <div className="px-4 md:px-8 pt-6 pb-12 max-w-5xl mx-auto">
@@ -67,15 +61,7 @@ export default async function ClassDetailPage({ params }: { params: { id: string
         {/* Header */}
         <div className="mb-8">
           <p className="text-xs font-label text-on-surface-variant/60 uppercase tracking-widest mb-1">Class</p>
-          <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-3xl md:text-4xl font-extrabold font-headline tracking-tight text-on-surface">{schoolClass.name}</h1>
-            {categoryLabel && (
-              <span className="text-xs font-label text-primary-dim px-2.5 py-1 rounded-full border border-primary/20"
-                style={{ background: 'rgba(124,58,237,0.08)' }}>
-                {categoryLabel}
-              </span>
-            )}
-          </div>
+          <h1 className="text-3xl md:text-4xl font-extrabold font-headline tracking-tight text-on-surface">{schoolClass.name}</h1>
           <p className="text-sm text-on-surface-variant/60 font-label mt-1">Teacher: {teacherName}</p>
         </div>
 

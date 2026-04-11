@@ -54,9 +54,6 @@ export default async function CourseDetailPage({ params }: { params: { id: strin
           <div className="space-y-2">
             <p className="md:hidden text-primary-dim font-label text-sm font-semibold tracking-wider uppercase">Module</p>
             <h1 className="text-3xl md:text-5xl font-headline font-extrabold tracking-tighter text-primary-dim">{moduleData.name}</h1>
-            <p className="text-on-surface-variant/60 font-label max-w-xl leading-relaxed">
-              {moduleData.books.length} book{moduleData.books.length !== 1 ? 's' : ''} · {totalChapters} chapter{totalChapters !== 1 ? 's' : ''} · Code: {moduleData.code}
-            </p>
           </div>
           <div className="hidden md:flex items-center gap-4">
             <Link
