@@ -2,12 +2,94 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { CaretDown } from '@phosphor-icons/react'
+import { CaretDown, Spinner } from '@phosphor-icons/react'
 import { teacherAvatar } from '@/lib/teacher-avatars'
+import { api } from '@/lib/api'
+import type { ApiStudent } from '@/lib/api-types'
 
 interface ClassChip {
   id: number
   name: string
+}
+
+function ClassesSection({ classes }: { classes: ClassChip[] }) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <div>
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="w-full flex items-center justify-between mb-2 group"
+      >
+        <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60 font-label">
+          Classes
+        </p>
+        <CaretDown
+          size={12}
+          weight="bold"
+          className={`text-on-surface-variant/40 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+        />
+      </button>
+      {open && (
+        <div className="flex flex-col gap-1.5">
+          {classes.map(cls => (
+            <ClassAccordionItem key={cls.id} cls={cls} />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ClassAccordionItem({ cls }: { cls: ClassChip }) {
+  const [open, setOpen] = useState(false)
+  const [students, setStudents] = useState<ApiStudent[] | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  async function handleToggle() {
+    if (!open && students === null) {
+      setLoading(true)
+      try {
+        const data = await api.listStudents({ class_id: cls.id })
+        setStudents(data)
+      } finally {
+        setLoading(false)
+      }
+    }
+    setOpen(v => !v)
+  }
+
+  return (
+    <div className="rounded-xl border border-white/[0.07] overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)' }}>
+      <button
+        onClick={handleToggle}
+        className="w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-white/[0.03] transition-colors"
+      >
+        <span className="text-xs font-bold font-label text-on-surface">{cls.name}</span>
+        {loading
+          ? <Spinner size={14} className="text-on-surface-variant/50 animate-spin" />
+          : <CaretDown size={14} weight="bold" className={`text-on-surface-variant/50 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+        }
+      </button>
+
+      {open && students !== null && (
+        <div className="border-t border-white/[0.06] px-3 py-2 flex flex-col gap-0.5">
+          {students.length === 0 && (
+            <p className="text-[11px] text-on-surface-variant/50 font-label py-1">No students enrolled</p>
+          )}
+          {students.map(s => (
+            <Link
+              key={s.id}
+              href={`/students/${s.id}`}
+              className="text-[11px] font-label text-on-surface-variant hover:text-primary-dim py-1 px-1 rounded hover:bg-primary/10 transition-colors"
+            >
+              {s.name}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }
 
 interface Props {
@@ -58,22 +140,9 @@ export default function TeacherCard({ teacher, classes, sessions, sessionsThisMo
       {/* Expanded content */}
       {open && (
         <div className="border-t border-white/[0.06] px-5 pb-6 pt-4 flex flex-col gap-5">
-          {/* Class chips */}
+          {/* Classes accordion */}
           {classes.length > 0 && (
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60 font-label mb-2">Classes</p>
-              <div className="flex flex-wrap gap-1.5">
-                {classes.map(cls => (
-                  <Link
-                    key={cls.id}
-                    href={`/teachers/${teacher.id}/${cls.id}`}
-                    className="px-2.5 py-1 rounded-full text-[10px] font-bold font-label bg-primary/10 text-primary-dim border border-primary/20 hover:bg-primary/20 active:scale-95 transition-all duration-150"
-                  >
-                    {cls.name}
-                  </Link>
-                ))}
-              </div>
-            </div>
+            <ClassesSection classes={classes} />
           )}
 
           {/* Stats row */}
