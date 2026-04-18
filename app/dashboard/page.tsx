@@ -11,6 +11,17 @@ function rateColor(rate: number) {
 
 export default async function DashboardPage() {
   const dashboard = await api.getDashboard();
+  const modules = await api.listModules();
+  const progresses = await Promise.all(
+    modules.map((m) => api.getModuleProgress(m.id))
+  );
+  const totalChapters = progresses.reduce(
+    (s, p) => s + p.module.total_chapters,
+    0
+  );
+  const totalTaught = progresses.reduce((s, p) => s + p.chapters_taught, 0);
+  const overallModuleCompletion =
+    totalChapters > 0 ? Math.round((totalTaught / totalChapters) * 100) : 0;
 
   return (
     <PrincipalShell>
@@ -46,7 +57,7 @@ export default async function DashboardPage() {
             <p className="text-xs text-on-surface-variant/60 font-label mt-2">Across all classes</p>
           </div>
 
-          {/* Overall module attendance */}
+          {/* Overall module completion */}
           <div
             className="col-span-2 rounded-2xl p-6 border border-secondary/20 relative overflow-hidden"
             style={{ background: 'linear-gradient(135deg, rgba(6,182,212,0.15), rgba(6,182,212,0.06))' }}
@@ -54,15 +65,15 @@ export default async function DashboardPage() {
             <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full blur-3xl"
               style={{ background: 'rgba(6,182,212,0.2)' }} />
             <p className="text-[10px] font-bold uppercase tracking-widest text-secondary-dim font-label mb-3">
-              Overall Module Attendance
+              Overall Module Completion
             </p>
             <div className="flex items-baseline gap-1">
               <span className="text-6xl font-black font-headline text-on-surface">
-                {dashboard.overall_module_attendance}
+                {overallModuleCompletion}
               </span>
               <span className="text-2xl font-bold text-on-surface-variant/60 font-headline">%</span>
             </div>
-            <p className="text-xs text-on-surface-variant/60 font-label mt-2">Across all modules</p>
+            <p className="text-xs text-on-surface-variant/60 font-label mt-2">% of module taught</p>
           </div>
 
           {/* Total students */}
