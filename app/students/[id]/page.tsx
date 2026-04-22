@@ -48,7 +48,6 @@ export default async function StudentProfilePage({ params }: { params: { id: str
   const { student, attendance_rate: overallRate, present_count: totalPresent, absent_count: totalAbsent, module_breakdown, participation_average } = profile
   const totalSessions = totalPresent + totalAbsent
   const participation = participationLabel(participation_average)
-  const isAwardEligible = overallRate >= 90
 
   // Fetch the raw student for its image/gender fields so we can render the avatar.
   const rawStudent = await api.getStudent(studentId)
@@ -186,31 +185,6 @@ export default async function StudentProfilePage({ params }: { params: { id: str
           </section>
         </div>
 
-        {/* ── Desktop award banner ── */}
-        {isAwardEligible && (
-          <section
-            className="hidden md:block p-8 rounded-2xl border border-white/[0.07] relative overflow-hidden mb-8"
-            style={glassCard}
-          >
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-              <div className="space-y-2">
-                <h2 className="text-2xl font-bold font-headline text-on-surface">Excellence Award Eligible</h2>
-                <p className="text-on-surface-variant/60 max-w-md font-label text-sm">
-                  {student.name} is maintaining {overallRate}% attendance. Keep it up to receive the Scholar Excellence recognition.
-                </p>
-              </div>
-              <button
-                className="font-bold px-8 py-3 rounded-xl text-white font-label whitespace-nowrap hover:opacity-90 transition-all"
-                style={{ background: 'linear-gradient(135deg, #7c3aed, #06b6d4)', boxShadow: '0 0 24px rgba(124,58,237,0.35)' }}
-              >
-                Download Attendance Report
-              </button>
-            </div>
-            <div className="absolute top-0 right-0 w-64 h-64 rounded-full -mr-20 -mt-20 blur-3xl" style={{ background: 'rgba(124,58,237,0.08)' }} />
-            <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full -ml-10 -mb-10 blur-3xl" style={{ background: 'rgba(6,182,212,0.06)' }} />
-          </section>
-        )}
-
         {/* ── Mobile hero ── */}
         <section className="md:hidden flex flex-col items-center text-center space-y-4 mb-8">
           <div className="relative">
@@ -306,25 +280,6 @@ export default async function StudentProfilePage({ params }: { params: { id: str
             })}
           </div>
         </section>
-
-        {/* ── Mobile award banner ── */}
-        {isAwardEligible && (
-          <section className="md:hidden p-6 rounded-2xl border border-white/[0.07] relative overflow-hidden mb-4" style={glassCard}>
-            <div className="relative z-10 space-y-3">
-              <h2 className="text-xl font-bold font-headline text-on-surface">Excellence Award Eligible</h2>
-              <p className="text-on-surface-variant/60 font-label text-sm">
-                {student.name} is maintaining {overallRate}% attendance — on track for the Scholar Excellence recognition.
-              </p>
-              <button
-                className="font-bold px-6 py-3 rounded-xl text-white font-label text-sm w-full hover:opacity-90 transition-all"
-                style={{ background: 'linear-gradient(135deg, #7c3aed, #06b6d4)', boxShadow: '0 0 20px rgba(124,58,237,0.3)' }}
-              >
-                Download Attendance Report
-              </button>
-            </div>
-            <div className="absolute top-0 right-0 w-32 h-32 rounded-full -mr-10 -mt-10 blur-3xl" style={{ background: 'rgba(124,58,237,0.1)' }} />
-          </section>
-        )}
 
       </div>
     </PrincipalShell>
