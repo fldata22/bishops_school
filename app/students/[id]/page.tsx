@@ -25,7 +25,9 @@ function avatarFor(id: number, imageUrl: string | null, gender: string | null) {
 
 function participationLabel(avg: number | null): { label: string; avg: number } | null {
   if (avg === null) return null
-  const pct = Math.round((avg / 4) * 100)
+  // Rubric maps level 1→0%, 2→25%, 3→50%, 4→75%. avg is the raw mean of
+  // levels (1–4); convert to the rubric's pct scale.
+  const pct = Math.round((avg - 1) * 25)
   const label =
     avg >= 3.5 ? 'Outstanding' :
     avg >= 2.5 ? 'Strong' :
