@@ -225,6 +225,12 @@ export const api = {
     request<void>(`/attendance/${id}`, { method: 'DELETE' }),
 
   // Participation
+  getParticipation: (query: { class_id: number; date: string }) =>
+    request<{
+      date: string
+      class_id: number
+      records: Array<{ student_id: number; participation_level: 1 | 2 | 3 | 4 }>
+    } | null>('/participation', { query }),
   submitParticipation: (body: {
     date: string
     teacher_id: number

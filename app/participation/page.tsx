@@ -53,16 +53,22 @@ export default function ParticipationPage() {
     if (!classId) { setStudents([]); setLevels({}); return }
     let cancelled = false
     setLoadingStudents(true)
-    api.listStudents({ class_id: Number(classId) })
-      .then(list => {
+    Promise.all([
+      api.listStudents({ class_id: Number(classId) }),
+      api.getParticipation({ class_id: Number(classId), date }),
+    ])
+      .then(([list, existing]) => {
         if (cancelled) return
         setStudents(list)
-        setLevels({})
+        const prefill: Record<number, 1 | 2 | 3 | 4> = existing
+          ? Object.fromEntries(existing.records.map(r => [r.student_id, r.participation_level]))
+          : {}
+        setLevels(prefill)
         setLoadingStudents(false)
       })
       .catch(() => { if (!cancelled) setLoadingStudents(false) })
     return () => { cancelled = true }
-  }, [classId])
+  }, [classId, date])
 
   const teacherClasses = useMemo(
     () => teacherId ? allClasses.filter(c => c.teacher_id === Number(teacherId)) : [],
