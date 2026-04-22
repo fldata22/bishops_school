@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useMemo } from 'react'
-import { api } from '@/lib/api'
+import { api, ApiError } from '@/lib/api'
 import type { ApiModule, ApiSchoolClass, ApiStudent, ApiTeacher } from '@/lib/api-types'
 import StudentToggleList from '@/components/attend/StudentToggleList'
 import SuccessScreen from '@/components/attend/SuccessScreen'
@@ -159,7 +159,11 @@ export default function AttendPage() {
       setSubmittedClassName(cls?.name ?? '')
       setSubmitted(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Submission failed.')
+      if (err instanceof ApiError && err.status === 422) {
+        setError('This data already exists for this class and date.')
+      } else {
+        setError(err instanceof Error ? err.message : 'Submission failed.')
+      }
     } finally {
       setSubmitting(false)
     }

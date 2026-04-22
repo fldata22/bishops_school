@@ -32,6 +32,17 @@ interface RequestOptions {
   next?: { revalidate?: number | false; tags?: string[] }
 }
 
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+    public readonly serverMessage?: string,
+  ) {
+    super(message)
+    this.name = 'ApiError'
+  }
+}
+
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { method = 'GET', body, query, cache, next } = options
 
@@ -60,14 +71,17 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   })
 
   if (!res.ok) {
-    let message = `API ${method} ${path} failed: ${res.status} ${res.statusText}`
+    let serverMessage: string | undefined
     try {
       const errorBody = await res.json()
-      if (errorBody?.message) message += ` — ${errorBody.message}`
+      if (typeof errorBody?.message === 'string') serverMessage = errorBody.message
     } catch {
       // ignore parse errors
     }
-    throw new Error(message)
+    const message = serverMessage
+      ? `API ${method} ${path} failed: ${res.status} ${res.statusText} — ${serverMessage}`
+      : `API ${method} ${path} failed: ${res.status} ${res.statusText}`
+    throw new ApiError(message, res.status, serverMessage)
   }
 
   if (res.status === 204) {

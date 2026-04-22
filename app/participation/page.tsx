@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, useMemo } from 'react'
 import { Info, CaretDown } from '@phosphor-icons/react'
-import { api } from '@/lib/api'
+import { api, ApiError } from '@/lib/api'
 import type { ApiSchoolClass, ApiStudent, ApiTeacher } from '@/lib/api-types'
 
 const LEVELS = [
@@ -99,7 +99,11 @@ export default function ParticipationPage() {
       await api.submitParticipation({ date, teacher_id: Number(teacherId), class_id: Number(classId), records })
       setSubmitted(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Submission failed.')
+      if (err instanceof ApiError && err.status === 422) {
+        setError('This data already exists for this class and date.')
+      } else {
+        setError(err instanceof Error ? err.message : 'Submission failed.')
+      }
     } finally {
       setSubmitting(false)
     }
